@@ -5,12 +5,11 @@ Created on Wed May 24 10:57:34 2023
 @author: bozzi
 """
 
-import potentialFieldController as pfc
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-import potentialfieldINternet as potfield
+import potentialField as pf
 
 
 x0 =[0,0]
@@ -54,21 +53,21 @@ s = 5 # safety size
 # plt.plot([row[0] for row in x],[row[1] for row in x])
 
 X, Y = np.meshgrid(np.arange(-0,50,1),np.arange(-0,50,1))
-delx, dely = potfield.add_goal(X, Y, r, s, xg)
+delx, dely = pf.add_goal(X, Y, r, s, xg)
 for i in range(len(xn)):
-	potfield.add_obstacle(X, Y, delx, dely, xg, xn[i])
+	pf.add_obstacle(X, Y, delx, dely, xg, xn[i])
 
 fig, ax = plt.subplots(figsize = (10,10))
 for _ in range(1):
-	delx, dely = potfield.add_goal(X, Y,1, 1 , xg)
+	delx, dely = pf.add_goal(X, Y,1, 1 , xg)
     
-	potfield.plot_graph(X, Y, delx, dely , 'Goal',fig, ax, xg, 1,0, 'b' )
+	pf.plot_graph(X, Y, delx, dely , 'Goal',fig, ax, xg, 1,0, 'b' )
 
 	for j in range(len(xn)):
-		delx, dely, loc, r = potfield.add_obstacle(X,Y, delx,dely,xg, xn[j])
-		potfield.plot_graph(X, Y, delx, dely , 'Obstacle',fig, ax, loc, r , j+1,'m')
+		delx, dely, loc, r = pf.add_obstacle(X,Y, delx,dely,xg, xn[j])
+		pf.plot_graph(X, Y, delx, dely , 'Obstacle',fig, ax, loc, r , j+1,'m')
 		ax.add_patch(plt.Circle(loc, 1, color='m'))
-		stream = ax.streamplot(X,Y,delx,dely, start_points=potfield.seek_points,linewidth=4, cmap='autu')
+		stream = ax.streamplot(X,Y,delx,dely, start_points=pf.seek_points,linewidth=4, cmap='autu')
 		
 trajectory= stream.lines.get_segments()
 plt.show()

@@ -7,7 +7,7 @@ Created on Fri May  5 11:49:13 2023
 
 import itertools
 
-class product:
+class Product:
     def init(self,mass,op_seq,due_date, ptype):
         self.id = itertools.count().next
         self.mass = mass

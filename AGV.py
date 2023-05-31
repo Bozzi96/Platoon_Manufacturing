@@ -4,13 +4,13 @@ Created on Fri May  5 10:05:57 2023
 
 @author: bozzi
 """
-import itertools
+
 import numpy as np
 
 
 class AGV:
-    def init(self, x, y, v_x, v_y, mass, battery, pos_platoon):
-        self.id = itertools.count().next
+    def init(self, who, x, y, v_x, v_y, mass, battery, pos_platoon):
+        self.who = who
         self.x = x
         self.y = y
         self.v_x = v_x
@@ -20,8 +20,8 @@ class AGV:
         self.pos_platoon = pos_platoon
     
     ### GETTERS        
-    def get_id(self):
-        return self.id
+    def get_who(self):
+        return self.who
     
     def get_x(self):
         return self.x
@@ -46,7 +46,8 @@ class AGV:
     
     def get_pos_platoon(self):
         return self.pos_platoon
-    
+	
+	
     ### SETTERS
     def set_x(self,x):
         self.x = x

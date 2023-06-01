@@ -24,10 +24,10 @@ N = int(config.netlogo.report("count vehicles")) # no. of AGVs
 P = int(config.netlogo.report("count products")) # no. of products
 M = int(config.netlogo.report("count machines")) #no. of machines
 
-machines = [[]]
+# Get machines position
+machines = []
 for i in range(0,M):
-	machines[i] = ncm.log_mach_pos(i+1)  ##TO FIX
-
+	machines.append(ncm.log_mach_pos(i+1))
 
 ### LOOP: Evolution of the system overtime
 for i in range(1,100):

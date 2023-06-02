@@ -29,6 +29,9 @@ machines = []
 for i in range(0,M):
 	machines.append(ncm.log_mach_pos(i+1))
 
+#TODO: Get recharging stations position
+
+
 ### LOOP: Evolution of the system overtime
-for i in range(1,100):
+for tick in range(1,100):
 	config.netlogo.command('B-Go')

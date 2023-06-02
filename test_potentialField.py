@@ -14,18 +14,18 @@ from matplotlib.animation import FuncAnimation
 import potentialField as pf
 
 
-x0 =[3,14] #initial position
-xg = [15,15] #goal position
+x0 =[0,0] #initial position
+xg = [20,15] #goal position
 x = [x0]
-xn = [[10, 10]] #obstacle
-r = 1 #goal size
+xn = [[10, 10], [6,6]] #obstacle
+r = 0.1 #goal size
 s = 4 # "attraction" size
 
 
 X, Y = np.meshgrid(np.arange(-0,100,1),np.arange(-0,100,1))
 delx, dely = pf.add_goal(X, Y, r, s, xg)
 for i in range(len(xn)):
-	delx, dely, loc, r = pf.add_obstacle(X, Y, delx, dely, r, s, xg, xn[i])
+	delx, dely, loc = pf.add_obstacle(X, Y, delx, dely, r, s, xg, xn[i])
 
 fig, ax = plt.subplots(figsize = (10,10))
 for _ in range(1):
@@ -34,7 +34,7 @@ for _ in range(1):
 	pf.plot_graph(X, Y, delx, dely , 'Goal',fig, ax, xg, 1,0, 'b')
 
 	for j in range(len(xn)):
-		delx, dely, loc, r = pf.add_obstacle(X,Y, delx,dely,r,s,xg, xn[j])
+		delx, dely, loc = pf.add_obstacle(X,Y, delx,dely,r,s,xg, xn[j])
 		pf.plot_graph(X, Y, delx, dely , 'Obstacle',fig, ax, loc, r , j+1,'m',)
 		ax.add_patch(plt.Circle(loc, 1, color='m'))
 stream = ax.streamplot(X,Y,delx,dely, start_points=[x0],linewidth=4)

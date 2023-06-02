@@ -124,4 +124,4 @@ def add_obstacle(X, Y , delx, dely, r, s, goal, obstacle):
           dely[i][j] = alpha* s *np.sin(theta_goal)
 
    
-  return delx, dely, obstacle, r
+  return delx, dely, obstacle

@@ -30,7 +30,7 @@ class AGV:
         return self.y
     
     def get_pos(self):
-        return [self.x,self.y]
+        return self.x, self.y
         
     def get_v_x(self):
         return self.v_x

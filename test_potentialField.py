@@ -8,9 +8,8 @@ Created on Wed May 24 10:57:34 2023
 """
 
 import numpy as np
-import math
+
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 import potentialField as pf
 
 

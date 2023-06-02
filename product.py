@@ -8,16 +8,16 @@ Created on Fri May  5 11:49:13 2023
 import itertools
 
 class Product:
-    def init(self,mass,op_seq,due_date, ptype):
-        self.id = itertools.count().next
+    def init(self,who,mass,op_seq,due_date, prod_type):
+        self.who = itertools.count().next
         self.mass = mass
         self.op_seq = op_seq
         self.due_date = due_date
-        self.ptype = ptype
+        self.prod_type = prod_type
     
     ### GETTERS
-    def get_id(self):
-        return self.id
+    def get_who(self):
+        return self.who
     
     def get_mass(self):
         return self.mass
@@ -28,8 +28,8 @@ class Product:
     def get_due_date(self):
         return self.due_date
     
-    def get_ptype(self):
-        return self.ptype
+    def get_prod_type(self):
+        return self.prod_type
     
     ### SETTERS
     def set_mass(self, mass):
@@ -41,6 +41,6 @@ class Product:
     def set_due_date(self, due_date):
         self.due_date = due_date
     
-    def set_ptype(self,ptype):
-        self.ptype = ptype
+    def set_prod_type(self,prod_type):
+        self.prod_type = prod_type
         

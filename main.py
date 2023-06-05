@@ -47,11 +47,11 @@ for i in range(0,N):
 	###########
 # Get products information and fill the structure to store data
 Products = []
-products_info, products_ops = ncm.log_prod_info()
+products_info = ncm.log_prod_info()
 for i in range(0,P):
-	#TODO: setup product operations
+	#TODO: setup product operations (for the moment is signed as 0)
 	Products.append(Product(products_info[i][0],products_info[i][1], products_info[i][2], \
-						 products_info[i][3], products_info[i][4], products_info[i][5],products_ops[i,:],0,0,0))
+						 products_info[i][3], products_info[i][4], products_info[i][5],0,0,0,0))
 
 ##### END: SETUP of static objects and parameters (no. AGVs, machines position, etc...)
 

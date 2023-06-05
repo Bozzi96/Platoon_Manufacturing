@@ -120,9 +120,12 @@ def log_veh_info():
 	#return who, xcor, ycor, battery
 	return info
 def log_prod_info():
+	#TODO: Find a way to store also product operations, cannot be done separately because the order is not the same
+	# for the moment, cannot be done at the same time because there is no way to handle at the same time integers 
+	# and array of strings that are returned from "netlogo.report"
 	info = netlogo.report("[(list who xcor ycor productreleaseorder productweight productduedate)] of products")
-	info2 = netlogo.report("[productoperations] of products")
-	return info, info2
+	#info2 = netlogo.report("[productoperations] of products")
+	return info#, info2
 
 # Position of all vehicles
 def log_veh_everyPos():

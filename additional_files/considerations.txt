@@ -1,0 +1,7 @@
+Questions and recommendations about coding in Python and in Netlogo.
+
+
+
+---Netlogo---
+1) How the attribute "batterycharge" works? Does it go from 0 % to 100%? Or does it go from 0 to 21/42/63 based on the battery capacity of vehicles? It would be better if any vehicle will have the same battery discharging (i.e. from 0 to 100%)
+2) How to handle strings and array of strings from netlogo to python? They can be easily read in netlogo, but in Python we need a precise structure to handle them. Maybe it is better to convert, when possible, string values into numerical ones (e.g. Operations: OP1 --> 1, etc...)

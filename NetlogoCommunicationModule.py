@@ -5,10 +5,10 @@ Created on Wed May 31 14:43:40 2023
 @author: bozzi
 """
 
+### SETUP of Netlogo
 import pyNetLogo
 global netlogo
 netlogo = pyNetLogo.NetLogoLink(gui=True) #Show NetLogo GUI
-
 
 
 ### VEHICLE attributes
@@ -109,11 +109,20 @@ def log_mach_pos(who):
 	return netlogo.report("[(list xcor ycor)] of machine " + str(who))
 def log_mach_initialInfo():
 	 return netlogo.report("[(list who xcor ycor item 0 machineoperprocessingtime)] of machines ")
+def log_station_initialInfo():
+	return netlogo.report("[(list who xcor ycor)] of recharge-stations")
 	
 
-# def log_machines_info():
-# 	infos = netlogo.report("[(list who xcor ycor machinetype machinestate machineoperprocessingtime machinenextcompletion)] of machines")
-# 	return infos
+# All info on vehicles
+def log_veh_info():
+	info = netlogo.report("[(list who xcor ycor vehiclebattery)] of vehicles")
+	#who, xcor, ycor, battery = info[:,0], info[:,1], info[:,2], info[:,3]
+	#return who, xcor, ycor, battery
+	return info
+def log_prod_info():
+	info = netlogo.report("[(list who xcor ycor productreleaseorder productweight productduedate)] of products")
+	info2 = netlogo.report("[productoperations] of products")
+	return info, info2
 
 # Position of all vehicles
 def log_veh_everyPos():

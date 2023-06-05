@@ -422,6 +422,17 @@ to K-CreatingProduct [#1 #2 #3 #4] ; #1: Id of product, #2: Type of product, #3:
     if (productType = "HH") [set ProductWeight 30 set ProductOperations (list "OP0" "OP3" "OP5" "OP9" "OP11")]
     if (productType = "II") [set ProductWeight 30 set ProductOperations (list "OP0" "OP3" "OP4" "OP6" "OP10" "OP11")]
     if (productType = "JJ") [set ProductWeight 30 set ProductOperations (list "OP0" "OP3" "OP5" "OP7" "OP10" "OP11")]
+; ProductOperations as integer
+;    if (productType = "AA") [set ProductWeight 20 set ProductOperations (list 0 1 4 7 11)]
+;    if (productType = "BB") [set ProductWeight 20 set ProductOperations (list 0 1 5 8 11)]
+;    if (productType = "CC") [set ProductWeight 20 set ProductOperations (list 0 1 3 9 11)]
+;    if (productType = "DD") [set ProductWeight 20 set ProductOperations (list 0 1 4 6 8 11)]
+;    if (productType = "EE") [set ProductWeight 20 set ProductOperations (list 0 2 5 6 9 11)]
+;    if (productType = "FF") [set ProductWeight 30 set ProductOperations (list 0 1 5 7 11)]
+;    if (productType = "GG") [set ProductWeight 30 set ProductOperations (list 0 2 5 8 11)]
+;    if (productType = "HH") [set ProductWeight 30 set ProductOperations (list 0 3 5 9 11)]
+;    if (productType = "II") [set ProductWeight 30 set ProductOperations (list 0 3 4 6 10 11)]
+;    if (productType = "JJ") [set ProductWeight 30 set ProductOperations (list 0 3 5 7 10 11)]
     set ProductState "To-be-released"
     set ProductReleaseOrder #3
     set ProductDueDate #4

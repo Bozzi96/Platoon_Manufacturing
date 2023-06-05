@@ -9,14 +9,15 @@ import numpy as np
 
 
 class AGV:
-    def init(self, who, x, y, v_x, v_y, mass, battery, pos_platoon):
+    def __init__(self, who, x, y, v_x, v_y, heading, battery, vehicle_type, pos_platoon):
         self.who = who
         self.x = x
         self.y = y
         self.v_x = v_x
         self.v_y = v_y
-        self.mass = mass
+        self.heading = heading
         self.battery = battery
+        self.vehicle_type = vehicle_type
         self.pos_platoon = pos_platoon
     
     ### GETTERS        
@@ -38,12 +39,12 @@ class AGV:
     def get_v_y(self):
         return self.v_y
     
-    def get_mass(self):
-        return self.mass
-    
     def get_battery(self):
         return self.battery
     
+    def get_vehicletype(self):
+        return self.vehicle_type
+	
     def get_pos_platoon(self):
         return self.pos_platoon
 	
@@ -64,10 +65,7 @@ class AGV:
     
     def set_v_y(self,v_y):
         self.v_y = v_y
-        
-    def set_mass(self,mass):
-        self.mass = mass
-        
+                
     def set_battery(self,battery):
         self.battery = battery
     

@@ -7,15 +7,15 @@ Created on Fri Jun  2 14:49:32 2023
 
 class Machine:
 	def __init__(self, who, x, y, machine_type, state, processing, completion, curr_vehicle, curr_product):
-		self.who = who
-		self. x = x
-		self.y = y
-		self.machine_type = machine_type
-		self.state = state
-		self.processing = processing
-		self.completion = completion
-		self.curr_vehicle = curr_vehicle
-		self.curr_product = curr_product
+		self.who = who #ID
+		self. x = x #x coordinate
+		self.y = y #y coordinate
+		self.machine_type = machine_type #machine type (only one type atm)
+		self.state = state #machine state: MachineBusy, MachineIdle
+		self.processing = processing #processing time
+		self.completion = completion #completion time of the next operation
+		self.curr_vehicle = curr_vehicle #vehicle inside the machine
+		self.curr_product = curr_product #product inside the machine
   ### GETTERS        
 	def get_who(self):
 		   return self.who

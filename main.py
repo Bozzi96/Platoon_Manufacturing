@@ -40,7 +40,7 @@ for i in range(0,S):
 AGVs = []
 agvs_info = ncm.log_veh_info()
 for i in range(0,N):
-	AGVs.append(AGV(agvs_info[i][0],agvs_info[i][1],agvs_info[i][2],0,0,0,agvs_info[i][3],agvs_info[i][3]/21,0))
+	AGVs.append(AGV(agvs_info[i][0],agvs_info[i][1],agvs_info[i][2],0,0,0,agvs_info[i][3],agvs_info[i][3]/21,0,0,0,0))
 	############
 	# Problem in retrieving values from netlogo: if I have int and string it is not possible to get them all at once
 	# Maybe we need to find a proper structure to store the values? netlogo.report for each attribute would be computationally heavy
@@ -49,7 +49,7 @@ for i in range(0,N):
 Products = []
 products_info = ncm.log_prod_info()
 for i in range(0,P):
-	#TODO: setup product operations (for the moment is signed as 0)
+	#TODO: setup product operations (for the moment is marked as 0)
 	Products.append(Product(products_info[i][0],products_info[i][1], products_info[i][2], \
 						 products_info[i][3], products_info[i][4], products_info[i][5],0,0,0,0))
 

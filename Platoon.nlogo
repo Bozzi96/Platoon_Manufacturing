@@ -46,7 +46,7 @@ Vehicles-Own [
   VehicleSpeed-Y              ; Indicates the speed in the y-axis
   VehicleSpeed-Total          ; Indicates the speed in the heading direction
   VehicleBatteryCharge        ; Indicates the charge of battery
-
+  VehicleValues
 ]
 
 Machines-Own [
@@ -58,6 +58,7 @@ Machines-Own [
   MachineNextCompletion       ; Important attribute that controls the completion time of an operation. Normally, it has the time of completion of next operation, or a big number (M)
   MachineProcessingProduct    ; Indicates which product is being process. "-" when is not processing product
   MachineWithVehicle          ; Indicates the Vehicle in the machine. "-" otherwise
+  MachineValues
 ]
 
 Recharge-Stations-Own [
@@ -87,6 +88,19 @@ to A-Setup
   ;test
 
 end
+
+to test
+
+  ask machines [
+    set MachineValues (list (word who) (word xcor) (word ycor) machineid MachineState MachineProcessingProduct (word MachineWithVehicle))
+  ]
+
+   ask vehicles [
+    set VehicleValues (list (word who) (word xcor) (word ycor) VehicleID (word VehicleDestinationNode) )
+  ]
+
+end
+
 
 to up
   ask vehicle 23 [
@@ -132,7 +146,7 @@ to B-Go
 
   tick
   set SimulationTime precision (SimulationTime + 0.05) 3
-
+ test
 
 end
 

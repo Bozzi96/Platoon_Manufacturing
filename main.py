@@ -18,7 +18,7 @@ from Station import Station
 model_path = r'Platoon.nlogo'
 ncm.netlogo.load_model(model_path)
 ncm.netlogo.command('A-Setup')
-
+ncm.netlogo.command('B-go')
 
 ##### BEGIN: SETUP of static objects and parameters (no. AGVs, machines position, etc...)
 N = int(ncm.netlogo.report("count vehicles")) # no. of AGVs

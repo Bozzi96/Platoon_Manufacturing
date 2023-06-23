@@ -96,7 +96,8 @@ class AGV:
 def distance_between_agvs(agv1: AGV, agv2: AGV):
     return np.linalg.norm(agv1.get_pos - agv2.get_pos)
 
-
+HIGH_CHARGE = 80
+LOW_CHARGE = 20
 def recharge_decision(self, rech_free, rech_tot, AGV_waiting, AGV_tot):
 	"""
 	Function to decide whether it is convenient or not to go to a recharging station
@@ -119,6 +120,10 @@ def recharge_decision(self, rech_free, rech_tot, AGV_waiting, AGV_tot):
 		False: don't go to recharging station
 
 	"""
+	if self.battery > HIGH_CHARGE:
+		return False
+	if self.battery < LOW_CHARGE:
+		return True
 	Kr = 0.25 # gain for importance of number of free recharging station
 	Ka = 0.25 # gain for importance of number of agv waiting in the queue
 	Kb = 0.5 # gain for importance of current state of charge of battery

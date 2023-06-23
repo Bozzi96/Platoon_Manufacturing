@@ -10,7 +10,7 @@ Created on Wed May 24 10:57:34 2023
 import numpy as np
 
 import matplotlib.pyplot as plt
-import potentialField as pf
+import potentialField_withTrajectory as pf
 
 
 x0 =[0,0] #initial position

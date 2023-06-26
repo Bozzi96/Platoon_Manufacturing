@@ -92,9 +92,26 @@ class AGV:
     def set_pos_platoon(self,pos_platoon):
         self.pos_platoon = pos_platoon
     
-# Useful methods
-def distance_between_agvs(agv1: AGV, agv2: AGV):
-    return np.linalg.norm(agv1.get_pos - agv2.get_pos)
+def distance_between_agvs(agv1: AGV, agv2: AGV) -> float:
+    """
+    Calculate the Euclidean distance between two AGVs (Automated Guided Vehicles).
+
+    Args:
+        agv1 (AGV): The first AGV object.
+        agv2 (AGV): The second AGV object.
+
+    Returns:
+        float: The Euclidean distance between the positions of the two AGVs.
+
+    Example:
+        agv1 = AGV()
+        agv1.set_pos(1, 2, 3)
+        agv2 = AGV()
+        agv2.set_pos(4, 5, 6)
+        distance = distance_between_agvs(agv1, agv2)
+        # distance is approximately 5.1962
+    """
+    return np.linalg.norm(agv1.get_pos() - agv2.get_pos())
 
 HIGH_CHARGE = 80
 LOW_CHARGE = 20

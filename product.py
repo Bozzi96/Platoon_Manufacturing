@@ -5,8 +5,6 @@ Created on Fri May  5 11:49:13 2023
 @author: bozzi
 """
 
-import itertools
-
 class Product:
     def __init__(self,who, x, y, release_order, weight,due_date,op_seq, curr_op, next_op, prod_type, vehicle):
         self.who = who

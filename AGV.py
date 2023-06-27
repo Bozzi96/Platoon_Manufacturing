@@ -6,6 +6,7 @@ Created on Fri May  5 10:05:57 2023
 """
 
 import numpy as np
+from scipy.spatial.distance import cdist
 
 
 class AGV:
@@ -149,3 +150,23 @@ def recharge_decision(self, rech_free, rech_tot, AGV_waiting, AGV_tot):
 		return True # Go to recharging station
 	else:
 		return False  # Don't go to recharging station
+	
+def compute_agvs_distances(agvs):
+    """
+    Compute pairwise distances between AGVs.
+
+    Args:
+        agvs (list): List of AGVs
+
+    Returns:
+        np.ndarray: 2D array containing pairwise distances between AGVs.
+            distances[i, j] contains the distance between agvs[i] and agvs[j].
+    """
+
+    # Extract the (x, y) coordinates from AGV objects
+    points = np.array([(agv.get_x, agv.get_y) for agv in agvs])
+
+    # Compute pairwise distances
+    distances = cdist(points, points)
+	 # TODO: verify if it it sufficient or if it is needed to add identifiers of AGVs
+    return distances

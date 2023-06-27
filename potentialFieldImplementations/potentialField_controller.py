@@ -91,6 +91,114 @@ def calculate_repulsive_force(current_position, obstacles, gain=100, safe_distan
 
     return force_x, force_y
 
+def calculate_repulsive_force_with_borders(current_position, obstacles, gain=100, safe_distance=1, boundary_x_min=-10, boundary_x_max=10, boundary_y_min=-10, boundary_y_max=10):
+    """
+    Calculates the repulsive force from the obstacles and rectangular environment borders.
+
+    Args:
+        current_position (tuple): The current position (x, y) of the object.
+        obstacles (list): A list of obstacle positions [(x1, y1), (x2, y2), ...].
+        gain (float, optional): The gain factor for repulsive force. Defaults to 100.
+        safe_distance (float, optional): The safe distance to maintain from obstacles. Defaults to 1.
+        boundary_x_min (float, optional): The minimum x-coordinate of the environment boundary. Defaults to -10.
+        boundary_x_max (float, optional): The maximum x-coordinate of the environment boundary. Defaults to 10.
+        boundary_y_min (float, optional): The minimum y-coordinate of the environment boundary. Defaults to -10.
+        boundary_y_max (float, optional): The maximum y-coordinate of the environment boundary. Defaults to 10.
+
+    Returns:
+        tuple: A tuple containing the repulsive force components (force_x, force_y).
+    """
+    force_x = 0
+    force_y = 0
+
+    # Calculate repulsive forces from obstacles
+    for obstacle in obstacles:
+        dx = obstacle[0] - current_position[0]
+        dy = obstacle[1] - current_position[1]
+        distance = math.sqrt(dx ** 2 + dy ** 2)
+
+        if distance < safe_distance:
+            force_x += -gain * (1 / distance - 1 / safe_distance) * (dx / distance ** 3)
+            force_y += -gain * (1 / distance - 1 / safe_distance) * (dy / distance ** 3)
+
+    # Calculate repulsive forces from rectangular environment borders
+    boundary_force_x = 0
+    boundary_force_y = 0
+
+    if current_position[0] < boundary_x_min:
+        boundary_force_x += gain / (current_position[0] - boundary_x_min)
+    elif current_position[0] > boundary_x_max:
+        boundary_force_x += -gain / (current_position[0] - boundary_x_max)
+
+    if current_position[1] < boundary_y_min:
+        boundary_force_y += gain / (current_position[1] - boundary_y_min)
+    elif current_position[1] > boundary_y_max:
+        boundary_force_y += -gain / (current_position[1] - boundary_y_max)
+
+    force_x += boundary_force_x
+    force_y += boundary_force_y
+
+    return force_x, force_y
+
+def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, gain=100, safe_distance=1, boundary_x_min=-10, boundary_x_max=10, boundary_y_min=-10, boundary_y_max=10):
+    """
+    Calculates the repulsive force from the obstacles, moving obstacles, and rectangular environment borders.
+
+    Args:
+        current_position (tuple): The current position (x, y) of the object.
+        obstacles (list): A list of obstacle positions [(x1, y1), (x2, y2), ...].
+        moving_obstacles (list): A list of moving obstacle positions [(x1, y1), (x2, y2), ...].
+        gain (float, optional): The gain factor for repulsive force. Defaults to 100.
+        safe_distance (float, optional): The safe distance to maintain from obstacles. Defaults to 1.
+        boundary_x_min (float, optional): The minimum x-coordinate of the environment boundary. Defaults to -10.
+        boundary_x_max (float, optional): The maximum x-coordinate of the environment boundary. Defaults to 10.
+        boundary_y_min (float, optional): The minimum y-coordinate of the environment boundary. Defaults to -10.
+        boundary_y_max (float, optional): The maximum y-coordinate of the environment boundary. Defaults to 10.
+
+    Returns:
+        tuple: A tuple containing the repulsive force components (force_x, force_y).
+    """
+    force_x = 0
+    force_y = 0
+
+    # Calculate repulsive forces from obstacles
+    for obstacle in obstacles:
+        dx = obstacle[0] - current_position[0]
+        dy = obstacle[1] - current_position[1]
+        distance = math.sqrt(dx ** 2 + dy ** 2)
+
+        if distance < safe_distance:
+            force_x += -gain * (1 / distance - 1 / safe_distance) * (dx / distance ** 3)
+            force_y += -gain * (1 / distance - 1 / safe_distance) * (dy / distance ** 3)
+
+    # Calculate repulsive forces from moving obstacles
+    for moving_obstacle in moving_obstacles:
+        dx = moving_obstacle[0] - current_position[0]
+        dy = moving_obstacle[1] - current_position[1]
+        distance = math.sqrt(dx ** 2 + dy ** 2)
+
+        if distance < safe_distance:
+            force_x += -gain * (1 / distance - 1 / safe_distance) * (dx / distance ** 3)
+            force_y += -gain * (1 / distance - 1 / safe_distance) * (dy / distance ** 3)
+
+    # Calculate repulsive forces from rectangular environment borders
+    boundary_force_x = 0
+    boundary_force_y = 0
+
+    if current_position[0] < boundary_x_min:
+        boundary_force_x += gain / (current_position[0] - boundary_x_min)
+    elif current_position[0] > boundary_x_max:
+        boundary_force_x += -gain / (current_position[0] - boundary_x_max)
+
+    if current_position[1] < boundary_y_min:
+        boundary_force_y += gain / (current_position[1] - boundary_y_min)
+    elif current_position[1] > boundary_y_max:
+        boundary_force_y += -gain / (current_position[1] - boundary_y_max)
+
+    force_x += boundary_force_x
+    force_y += boundary_force_y
+
+    return force_x, force_y
 
 def convert_force_to_speed(force, mass, time_interval):
     """

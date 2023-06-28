@@ -108,8 +108,8 @@ def log_prod_in_mach(who):
 def log_mach_pos(who):
 	return netlogo.report("[(list xcor ycor)] of machine " + str(who))
 def log_mach_initialInfo():
-#	 return netlogo.report("[(list who xcor ycor item 0 machineoperprocessingtime)] of machines ")
-	 return netlogo.report("[MachineValues] of machines")
+	 return netlogo.report("[(list who xcor ycor item 0 machineoperprocessingtime)] of machines ")
+#	 return netlogo.report("[MachineValues] of machines")
 def log_station_initialInfo():
 	return netlogo.report("[(list who xcor ycor)] of recharge-stations")
 	

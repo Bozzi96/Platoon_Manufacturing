@@ -30,7 +30,7 @@ S = int(ncm.netlogo.report("count recharge-stations")) #no. of recharging statio
 machines_info = ncm.log_mach_initialInfo()
 Machines = []
 for i in range(0,M):
-	Machines.append(Machine(machines_info[i][0],machines_info[i][1],machines_info[i][2],"Normal","MachineIdle",machines_info[i][3],1000000, 0, 0))
+	Machines.append(Machine(machines_info[i][0],machines_info[i][1],machines_info[i][2],"Normal","MachineIdle",machines_info[i][3],1000000,))
 # Get recharging stations information and fill the structure to store data
 Stations = []
 stations_info = ncm.log_station_initialInfo()
@@ -51,7 +51,7 @@ products_info = ncm.log_prod_info()
 for i in range(0,P):
 	#TODO: setup product operations (for the moment is marked as 0)
 	Products.append(Product(products_info[i][0],products_info[i][1], products_info[i][2], \
-						 products_info[i][3], products_info[i][4], products_info[i][5],0,0,0,0))
+						 products_info[i][3], products_info[i][4], products_info[i][5],0,0,0,0,0))
 
 ##### END: SETUP of static objects and parameters (no. AGVs, machines position, etc...)
 
@@ -72,5 +72,4 @@ for tick in range(1,100):
 	## 2c. Control them as a platoon (how?) --> That will be difficult
 	### END: Control algorithm
 	
-	
-print("END OF MAIN")
+

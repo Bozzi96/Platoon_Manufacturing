@@ -108,29 +108,49 @@ def log_prod_in_mach(who):
 def log_mach_pos(who):
 	return netlogo.report("[(list xcor ycor)] of machine " + str(who))
 def log_mach_initialInfo():
-	 return netlogo.report("[(list who xcor ycor item 0 machineoperprocessingtime)] of machines ")
+	 return netlogo.report("[(list who xcor ycor MachineID)] of machines ")
 #	 return netlogo.report("[MachineValues] of machines")
 def log_station_initialInfo():
-	return netlogo.report("[(list who xcor ycor)] of recharge-stations")
+	return netlogo.report("[(list who xcor ycor Rech.StationID)] of recharge-stations")
 	
-
 # All info on vehicles
-def log_veh_info():
-	info = netlogo.report("[(list who xcor ycor vehiclebattery)] of vehicles")
-	#who, xcor, ycor, battery = info[:,0], info[:,1], info[:,2], info[:,3]
-	#return who, xcor, ycor, battery
+def log_veh_initialInfo():
+	info = netlogo.report("[(list who xcor ycor VehicleID VehicleType)] of vehicles")
 	return info
-def log_prod_info():
-	#TODO: Find a way to store also product operations, cannot be done separately because the order is not the same
-	# for the moment, cannot be done at the same time because there is no way to handle at the same time integers 
-	# and array of strings that are returned from "netlogo.report"
-	info = netlogo.report("[(list who xcor ycor productreleaseorder productweight productduedate)] of products")
-	#info2 = netlogo.report("[productoperations] of products")
-	return info#, info2
+
+def log_prod_initialInfo():
+	productInfo = "[(list who xcor ycor ProductID ProductReleaseOrder ProductWeight ProductDueDate ProductType)] of products"
+	info = netlogo.report(productInfo)
+	return info
 
 # Position of all vehicles
 def log_veh_everyPos():
-	return netlogo.report("[(list xcor ycor who)] of vehicles")
+	return netlogo.report("[(list VehicleId xcor ycor)] of vehicles")
 # Position of all products
 def log_prod_everyPos():
 	return netlogo.report("[(list xcor ycor who)] of products")
+
+### Periodic communication
+# Periodic info on vehicles
+def log_veh_info():
+	instruction = "[(list xcor ycor VehicleId VehicleSpeed-X VehicleSpeed-Y " \
+					    "VehicleBatteryCharge VehicleState VehicleWithProduct " \
+							"VehicleDestinationNode VehicleDestinationEntity)] of vehicles"
+	return netlogo.report(instruction)
+
+# Periodic info on products
+def log_prod_info():
+	instruction = "[(list ProductId xcor ycor)] of products"
+	return netlogo.report(instruction)
+
+# Periodic info on machines
+def log_mach_info():
+	instruction = "[(list MachineId MachineState MachineWithVehicle " \
+		"MachineProcessingProduct )] of machines"
+	return netlogo.report(instruction)
+
+#Periodic info on recharging stations
+def log_rech_info():
+	instruction = "[(list Rech.StationId Rech.State Rech.NextCompletion " \
+		"Rech.WithVehicle Rech.ReservedForVehicle )] of recharge-stations"
+	return netlogo.report(instruction)

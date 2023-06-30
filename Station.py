@@ -6,11 +6,11 @@ Created on Fri Jun  2 16:41:32 2023
 """
 
 class Station:
-	def __init__(self,who,x,y,recharge_type,state,completion,curr_vehicle,reserved_vehicle):
+	def __init__(self,who,x,y,station_id,state, completion, curr_vehicle,reserved_vehicle):
 		self.who = who
 		self.x = x
 		self.y = y
-		self.recharge_type = recharge_type
+		self.station_id = station_id
 		self.state = state
 		self.completion = completion
 		self.curr_vehicle = curr_vehicle
@@ -29,8 +29,8 @@ class Station:
 	def get_pos(self):
 		return self.x, self.y
 	   
-	def get_type(self):
-		return self.recharge_type
+	def get_station_id(self):
+		return self.station_id
 
 	def get_state(self):
 		return self.state

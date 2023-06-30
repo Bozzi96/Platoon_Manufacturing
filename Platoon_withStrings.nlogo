@@ -19,9 +19,9 @@ breed [Recharge-Stations Recharge-Station]
 
 Products-Own [
   ProductID                   ; Indicates the identifier of the product within the ProductionOrder. ID is diferent than who
-  ProductType                 ; AA = 1, BB = 2, CC = 3, DD = 4, EE 5, FF = 6, GG = 7, HH = 8, II = 9, JJ = 10,
-  ProductWeight               ; Integer  --> AA = 20, BB = 20, CC = 20, DD = 20, EE = 20 , FF = 30, GG = 30, HH = 30, II = 30, JJ = 30
-  ProductState                ; Integer  --> To-be-released = 0 , Releasing = 1, Transport = 2, Being-Processed = 3, Exiting = 4, Finished = 5
+  ProductType                 ; AA, BB, CC, DD, EE, FF, GG, HH, II, JJ,
+  ProductWeight               ; AA =, BB =, CC =, DD =, EE = , FF = , GG = , HH = , II = , JJ =
+  ProductState                ; To-be-released, Releasing, Transport, Being-Processed, Finished
   ProductOperations           ; List of operations of the product
   ProductReleaseOrder         ; Indicates the Release order within the production order
   ProductDueDate              ; Indicates the due date for the product
@@ -29,41 +29,42 @@ Products-Own [
   ProductNextOperation        ; Indicates what would be the next operation
   ProductStartOperation       ; Indicates in a list when the operation started processing. The order in the list follows the position of the operarion list "ProductOperations"
   ProductCompletionOperation  ; Indicates in a list when the operation finished processing. The order in the list follows the position of the operarion list "ProductOperations"
-  ProductInVehicle            ; Indicates which is the vehicle moving the product. "0" when is not on a vehicle
-  ProductInMachine            ; Indicates which machine is processing product. "0" when is not on a vehicle
+  ProductInVehicle            ; Indicates which is the vehicle moving the product. "-" when is not on a vehicle
+  ProductInMachine            ; Indicates which machine is processing product. "-" when is not on a vehicle
 ]
 
 Vehicles-Own [
   MathematicalAngle           ; Indicate the heading but in mathematical angles
   VehicleID                   ; Indicates the identifier of the vehicle within the production layout. ID is diferent than who
-  VehicleType                 ; Type 1 = 1, Type 2 = 2, Type 3 = 3
-  VehicleState                ; WaitingLoading = 1, Stand-By = 2, Moving = 3, WaitingMachine = 4, GoingCharger = 5, Charging = 6, WaitingOutside = 7,
-  VehicleWithProduct          ; Indicates the product being carried/ "0" Otherwise
-  VehicleBattery              ; Type 1 = 21, Type 2 = 42, Type 3 = 63
+  VehicleType                 ; T1, T2, T3
+  VehicleState                ; Moving, WaitingMachine, WaitingCharging, WaitingOutside, WaitingLoading, GoingCharger, Charging
+  VehicleWithProduct          ; Indicates the product being carried/ "-" Otherwise
+  VehicleBattery              ; T1 = 21, T2 = 42, T3 = 63
   VehicleDestinationNode      ; Indicates the node of destination
-  VehicleDestinationEntity    ; Indicates the entity of destination. Could be: Machine = 1, ExitingVehicle = 2, ChargingStation = 3, LoadingStation = 4
+  VehicleDestinationEntity    ; Indicates the entity of destination. Could be: Machine, RechargingStation, RestArea, LoadingStation, UnloadingStation
   VehicleSpeed-X              ; Indicates the speed in the x-axis
   VehicleSpeed-Y              ; Indicates the speed in the y-axis
   VehicleSpeed-Total          ; Indicates the speed in the heading direction
   VehicleBatteryCharge        ; Indicates the charge of battery
-
+  VehicleValues
 ]
 
 Machines-Own [
   MachineID                   ; Indicates the identifier of the machine within the production layout. ID is diferent than who
   MachineType                 ; Type of machine. For A.Bozzi, it has only one type.
-  MachineState                ; MachineBusy = 1, MachineIdle = 0, MachineBrakedown. For A.Bozzi, just first two.
+  MachineState                ; MachineBusy, MachineIdle, MachineBrakedown. For A.Bozzi, just first two.
   MachinePossibleOperations   ; Indicates what are the operations that the machine is capable fo process.
   MachineOperProcessingTime   ; Indicates the processing times of each operation. Order must be follow the list of operations "MachinePossibleOperations"
   MachineNextCompletion       ; Important attribute that controls the completion time of an operation. Normally, it has the time of completion of next operation, or a big number (M)
-  MachineProcessingProduct    ; Indicates which product is being process. "0" when is not processing product
-  MachineWithVehicle          ; Indicates the Vehicle in the machine. "0" otherwise
+  MachineProcessingProduct    ; Indicates which product is being process. "-" when is not processing product
+  MachineWithVehicle          ; Indicates the Vehicle in the machine. "-" otherwise
+  MachineValues
 ]
 
 Recharge-Stations-Own [
   Rech.StationID              ; Indicates the identifier of the recharging Station within the production layout. ID is diferent than who
   Rech.Type                   ; Type of Recharching Station. For A.Bozzi, it has only one type.
-  Rech.State                  ; Rech.Idle =  0, Rech.busy = 1
+  Rech.State                  ; RechargeStationBusy, RechargeStationIdle, RechargeStatioBrakedown. For A.Bozzi, just first two.
   Rech.NextCompletion         ; Important attribute that controls the completion time of an operation. Normally, it has the time of completion of next operation, or a big number (M)
   Rech.WithVehicle            ; Indicates which vechike is being process. "-" when is not processing product
   Rech.ReservedForVehicle     ; Indicates which Vehicle will arrive here
@@ -80,13 +81,26 @@ to A-Setup
   Z-Layout
   X-SetupMachines
   Y-Setup-Corridor
-  L-CreatingVehiclesFleet (list 1 2 3 1 1 2 3 1 3 1)
+  L-CreatingVehiclesFleet (list "T1" "T2" "T3" "T1" "T1" "T2" "T3" "T1" "T3" "T1")
 
   J-CreatingProductionOrder
 
   ;test
 
 end
+
+to test
+
+  ask machines [
+    set MachineValues (list (word who) (word xcor) (word ycor) machineid MachineState MachineProcessingProduct (word MachineWithVehicle))
+  ]
+
+   ask vehicles [
+    set VehicleValues (list (word who) (word xcor) (word ycor) VehicleID (word VehicleDestinationNode) )
+  ]
+
+end
+
 
 to up
   ask vehicle 23 [
@@ -132,7 +146,7 @@ to B-Go
 
   tick
   set SimulationTime precision (SimulationTime + 0.05) 3
-
+ test
 
 end
 
@@ -141,18 +155,18 @@ to C-ReleasingProducts
   ask products with [xcor = 23 and ycor = 70] with-min [ProductReleaseOrder][
     if((count vehicles with [xcor = 34 and ycor = 70] = 1) and (count products with [xcor > 23 and xcor <= 34 and ycor = 70] = 0)) [
       set heading 90
-      set ProductState 1
+      set ProductState "Releasing"
       set ProductStartOperation lput SimulationTime ProductStartOperation
     ]
   ]
 
   ask turtle 0 [
     let ProductReleaseVar ""
-    if(count products in-radius 2 with [ProductState = 1] = 1)[
-      ask products in-radius 2 with [ProductState = 1][
+    if(count products in-radius 2 with [ProductState = "Releasing"] = 1)[
+      ask products in-radius 2 with [ProductState = "Releasing"][
         set ProductReleaseVar who
         move-to turtle 0
-        set ProductState 2
+        set ProductState "Transport"
       ]
       ask product ProductReleaseVar [
         set ProductCompletionOperation lput SimulationTime ProductCompletionOperation
@@ -162,14 +176,14 @@ to C-ReleasingProducts
 
         set ProductInVehicle item 0 [who] of vehicles with [xcor = 34 and ycor = 70]
         ask vehicles with [xcor = 34 and ycor = 70][
-          if (VehicleType = 1) [set shape "newsquare-t1"]
-          if (VehicleType = 2) [set shape "newsquare-t2"]
-          if (VehicleType = 3) [set shape "newsquare-t3"]
-          set VehicleState 3
+          if (VehicleType = "T1") [set shape "newsquare-t1"]
+          if (VehicleType = "T2") [set shape "newsquare-t2"]
+          if (VehicleType = "T3") [set shape "newsquare-t3"]
+          set VehicleState "Moving"
           set VehicleWithProduct temporalProductVar
           let TemporalDestNodeVar [who] of machines with [item 0 MachinePossibleOperations = TemporalProNextOperVar]
           set VehicleDestinationNode item 0 TemporalDestNodeVar
-          set VehicleDestinationEntity 1
+          set VehicleDestinationEntity "Machine"
           set VehicleSpeed-X 0.8
           set VehicleSpeed-Y 0
           set VehicleSpeed-Total 0.8
@@ -186,8 +200,8 @@ end
 to D-MovingVehicles
 
   ifelse (Default = false)[
-    ask vehicles with [VehicleState = 3][
-      if (VehicleWithProduct != 0)[
+    ask vehicles with [VehicleState = "Moving"][
+      if (VehicleWithProduct != "None")[
         set VehicleSpeed-Total sqrt (VehicleSpeed-X ^ 2 + VehicleSpeed-Y ^ 2)
 
         if(VehicleSpeed-X >= 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
@@ -202,15 +216,15 @@ to D-MovingVehicles
         set ycor  precision ycor 3
         ask product VehicleWithProduct [move-to turtle ProductInVehicle]
       ]
-      if (VehicleWithProduct = 0)[
+      if (VehicleWithProduct = "None")[
         if (count vehicles in-cone 25 70 < 2) [forward 0.8]                                   ; Change according to speed
         set xcor  precision xcor 3
         set ycor  precision ycor 3
       ]
     ]
   ][
-    ask vehicles with [VehicleState = 3][
-      if (VehicleWithProduct != 0)[
+    ask vehicles with [VehicleState = "Moving"][
+      if (VehicleWithProduct != "None")[
         face turtle VehicleDestinationNode
         set heading precision heading 3
         set VehicleSpeed-Total 0.8
@@ -223,7 +237,7 @@ to D-MovingVehicles
         set ycor  precision ycor 3
         ask product VehicleWithProduct [move-to turtle ProductInVehicle]
       ]
-      if (VehicleWithProduct = 0)[
+      if (VehicleWithProduct = "None")[
         if (count vehicles in-cone 25 70 < 2) [forward 0.8]                                     ; Change according to speed, change in-cone xx for changing teh spacing
         set xcor  precision xcor 3
         set ycor  precision ycor 3
@@ -232,12 +246,12 @@ to D-MovingVehicles
   ]
 
 
-  ask products with [ProductState = 1][
+  ask products with [ProductState = "Releasing"][
     forward 0.32                                          ; Speed of releasing product
     set xcor  precision xcor 3
     set ycor  precision ycor 3
   ]
-  ask products with [ProductState = 4][
+  ask products with [ProductState = "Exiting"][
     forward 0.32                                          ; Speed of existing product
     set xcor  precision xcor 3
     set ycor  precision ycor 3
@@ -251,7 +265,7 @@ to E-MachineEntry
   ask machines [
     let temporalMachineVar who
 
-    if(count vehicles in-radius 2 with [VehicleState = 3 and VehicleDestinationNode = temporalMachineVar] = 1)[
+    if(count vehicles in-radius 2 with [VehicleState = "Moving" and VehicleDestinationNode = temporalMachineVar] = 1)[
 
       let temporalVehicleVar ""
       let TemporalOperationVar ""
@@ -260,16 +274,16 @@ to E-MachineEntry
         move-to machine temporalMachineVar
         ask product VehicleWithProduct [move-to machine temporalMachineVar]
       ]
-      set MachineState 1
+      set MachineState "MachineBusy"
       let temporalX xcor
       let temporalY ycor
       set MachineWithVehicle item 0 [who] of vehicles with [xcor = temporalX and ycor = temporalY]
       set MachineProcessingProduct [VehicleWithProduct] of vehicle MachineWithVehicle
       ask vehicle MachineWithVehicle [
-        set VehicleState 4
+        set VehicleState "WaitingMachine"
       ]
       ask product MachineProcessingProduct[
-        set ProductState 3
+        set ProductState "Being-Processed"
         set ProductStartOperation lput SimulationTime ProductStartOperation
         set ProductInMachine TemporalMachineVar
         set TemporalOperationVar item ProductNextOperation ProductOperations
@@ -288,11 +302,11 @@ to F-MachineExit
     if (MachineNextCompletion <= SimulationTime) [
       let TemporalDestNodeVar ""
       ask product MachineProcessingProduct[
-        set ProductState 2
+        set ProductState "Transport"
         set ProductCurrentOperation (length ProductCompletionOperation)
         set ProductCompletionOperation lput SimulationTime ProductCompletionOperation
         set ProductNextOperation ProductCurrentOperation + 1
-        set ProductInMachine 0
+        set ProductInMachine "-"
         let TemporalProNextOperVar item ProductNextOperation ProductOperations
         ifelse(length ProductCompletionOperation < (length productoperations) - 1)[
           set TemporalDestNodeVar [who] of machines with [item 0 MachinePossibleOperations = TemporalProNextOperVar]
@@ -301,9 +315,9 @@ to F-MachineExit
         ]
       ]
       ask vehicle MachineWithVehicle[
-        set VehicleState 3
+        set VehicleState "Moving"
         set VehicleDestinationNode item 0 TemporalDestNodeVar
-        set VehicleDestinationEntity 1
+        set VehicleDestinationEntity "Machine"
         ifelse (MachineTemp <= 5)[
           set VehicleSpeed-X 0
           set VehicleSpeed-Y -0.8
@@ -314,10 +328,10 @@ to F-MachineExit
           set VehicleSpeed-Total 0.8
         ]
       ]
-      set MachineState 0
+      set MachineState "MachineIdle"
       set MachineNextCompletion  10000000
-      set MachineProcessingProduct 0
-      set MachineWithVehicle 0
+      set MachineProcessingProduct "-"
+      set MachineWithVehicle "-"
     ]
   ]
 
@@ -335,27 +349,27 @@ to I-CompletingProduct
 
 
   ask vehicles with [xcor >= 33.6 and xcor <= 34.4 and ycor >= 49.6 and ycor <= 50.4][
-    if(VehicleWithProduct != 0)[
+    if(VehicleWithProduct != "None")[
       move-to turtle 11
       set heading 180
-      if (VehicleType = 1) [set shape "t1"]
-      if (VehicleType = 2) [set shape "t2"]
-      if (VehicleType = 3) [set shape "t3"]
-      set VehicleState 3
+      if (VehicleType = "T1") [set shape "t1"]
+      if (VehicleType = "T2") [set shape "t2"]
+      if (VehicleType = "T3") [set shape "t3"]
+      set VehicleState "Moving"
       ask Product VehicleWithProduct [
-        set ProductState 4
+        set ProductState "Exiting"
         set heading 270
         set ProductCurrentOperation ProductCurrentOperation + 1
-        set ProductnextOperation 5
+        set ProductnextOperation "finished"
         set ProductStartOperation lput SimulationTime ProductStartOperation
       ]
-      set VehicleWithProduct 0
+      set VehicleWithProduct "None"
       set VehicleDestinationNode 22
-      set vehicleDestinationEntity 2
+      set vehicleDestinationEntity "ExitingVehicle"
       let tempVehicleAssignStation who
-      if (VehicleBatteryCharge <= 10 and (count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5) [
-        set VehicleState  5
-        set vehicleDestinationEntity 3
+      if (VehicleBatteryCharge <= 10 and (count vehicles with [VehicleState =  "GoingCharger"] + count vehicles with [VehicleState = "Charging"]) < 5) [
+        set VehicleState  "GoingCharger"
+        set vehicleDestinationEntity "ChargingStation"
         set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle =  "None"]
         face VehicleDestinationNode
         ask VehicleDestinationNode [
@@ -369,9 +383,9 @@ to I-CompletingProduct
   ]
 
   ask products with [xcor >= 22.7 and xcor <= 23.3 and ycor >= 49.7 and ycor <= 50.3][
-    if(ProductState != 5)[
+    if(ProductState != "Finished")[
       set ProductCompletionOperation lput SimulationTime ProductCompletionOperation
-      set ProductState 5
+      set ProductState "Finished"
     ]
   ]
 end
@@ -379,25 +393,25 @@ end
 to J-CreatingProductionOrder
 
   if (Default = True)[
-    K-CreatingProduct 201 1 0 2000
-    K-CreatingProduct 202 8 1 2000
-    K-CreatingProduct 203 1 2 2000
-    K-CreatingProduct 204 8 3 2000
-    K-CreatingProduct 205 1 4 2000
-    K-CreatingProduct 206 1 5 2000
-    K-CreatingProduct 207 1 6 2000
-    K-CreatingProduct 208 8 7 2000
-    K-CreatingProduct 209 1 8 2000
-    K-CreatingProduct 210 8 9 2000
-    K-CreatingProduct 211 1 0.1 2000
-    K-CreatingProduct 212 8 0.2 2000
-    K-CreatingProduct 213 1 12 2000
-    K-CreatingProduct 214 8 13 2000
-    K-CreatingProduct 215 1 14 2000
+    K-CreatingProduct "P-504" "AA" 0 2000
+    K-CreatingProduct "P-504" "HH" 1 2000
+    K-CreatingProduct "P-504" "AA" 2 2000
+    K-CreatingProduct "P-504" "HH" 3 2000
+    K-CreatingProduct "P-504" "AA" 4 2000
+    K-CreatingProduct "P-504" "AA" 5 2000
+    K-CreatingProduct "P-504" "AA" 6 2000
+    K-CreatingProduct "P-504" "HH" 7 2000
+    K-CreatingProduct "P-504" "AA" 8 2000
+    K-CreatingProduct "P-504" "HH" 9 2000
+    K-CreatingProduct "P-504" "AA" 0.1 2000
+    K-CreatingProduct "P-504" "HH" 0.2 2000
+    K-CreatingProduct "P-504" "AA" 12 2000
+    K-CreatingProduct "P-504" "HH" 13 2000
+    K-CreatingProduct "P-504" "AA" 14 2000
   ]
 
   if (Default = False)[
-    K-CreatingProduct 504 1 0 2000
+    K-CreatingProduct "P-504" "AA" 0 2000
   ]
 
 end
@@ -412,30 +426,41 @@ to K-CreatingProduct [#1 #2 #3 #4] ; #1: Id of product, #2: Type of product, #3:
     set size 5.5
     set ProductID #1
     set ProductType #2
-    if (productType = 1) [set ProductWeight 20 set ProductOperations (list 0 1 4 7 11)]
-    if (productType = 2) [set ProductWeight 20 set ProductOperations (list 0 1 5 8 11)]
-    if (productType = 3) [set ProductWeight 20 set ProductOperations (list 0 1 3 9 11)]
-    if (productType = 4) [set ProductWeight 20 set ProductOperations (list 0 1 4 6 8 11)]
-    if (productType = 5) [set ProductWeight 20 set ProductOperations (list 0 2 5 6 9 11)]
-    if (productType = 6) [set ProductWeight 30 set ProductOperations (list 0 1 5 7 11)]
-    if (productType = 7) [set ProductWeight 30 set ProductOperations (list 0 2 5 8 11)]
-    if (productType = 8) [set ProductWeight 30 set ProductOperations (list 0 3 5 9 11)]
-    if (productType = 9) [set ProductWeight 30 set ProductOperations (list 0 3 4 6 10 11)]
-    if (productType = 10) [set ProductWeight 30 set ProductOperations (list 0 3 5 7 10 11)]
-    set ProductState 0
+    if (productType = "AA") [set ProductWeight 20 set ProductOperations (list "OP0" "OP1" "OP4" "OP7" "OP11")]
+    if (productType = "BB") [set ProductWeight 20 set ProductOperations (list "OP0" "OP1" "OP5" "OP8" "OP11")]
+    if (productType = "CC") [set ProductWeight 20 set ProductOperations (list "OP0" "OP1" "OP3" "OP9" "OP11")]
+    if (productType = "DD") [set ProductWeight 20 set ProductOperations (list "OP0" "OP1" "OP4" "OP6" "OP8" "OP11")]
+    if (productType = "EE") [set ProductWeight 20 set ProductOperations (list "OP0" "OP2" "OP5" "OP6" "OP9" "OP11")]
+    if (productType = "FF") [set ProductWeight 30 set ProductOperations (list "OP0" "OP1" "OP5" "OP7" "OP11")]
+    if (productType = "GG") [set ProductWeight 30 set ProductOperations (list "OP0" "OP2" "OP5" "OP8" "OP11")]
+    if (productType = "HH") [set ProductWeight 30 set ProductOperations (list "OP0" "OP3" "OP5" "OP9" "OP11")]
+    if (productType = "II") [set ProductWeight 30 set ProductOperations (list "OP0" "OP3" "OP4" "OP6" "OP10" "OP11")]
+    if (productType = "JJ") [set ProductWeight 30 set ProductOperations (list "OP0" "OP3" "OP5" "OP7" "OP10" "OP11")]
+; ProductOperations as integer
+;    if (productType = "AA") [set ProductWeight 20 set ProductOperations (list 0 1 4 7 11)]
+;    if (productType = "BB") [set ProductWeight 20 set ProductOperations (list 0 1 5 8 11)]
+;    if (productType = "CC") [set ProductWeight 20 set ProductOperations (list 0 1 3 9 11)]
+;    if (productType = "DD") [set ProductWeight 20 set ProductOperations (list 0 1 4 6 8 11)]
+;    if (productType = "EE") [set ProductWeight 20 set ProductOperations (list 0 2 5 6 9 11)]
+;    if (productType = "FF") [set ProductWeight 30 set ProductOperations (list 0 1 5 7 11)]
+;    if (productType = "GG") [set ProductWeight 30 set ProductOperations (list 0 2 5 8 11)]
+;    if (productType = "HH") [set ProductWeight 30 set ProductOperations (list 0 3 5 9 11)]
+;    if (productType = "II") [set ProductWeight 30 set ProductOperations (list 0 3 4 6 10 11)]
+;    if (productType = "JJ") [set ProductWeight 30 set ProductOperations (list 0 3 5 7 10 11)]
+    set ProductState "To-be-released"
     set ProductReleaseOrder #3
     set ProductDueDate #4
     set ProductCurrentOperation "-"
     set ProductNextOperation 0
     set ProductStartOperation[]
     set ProductCompletionOperation[]
-    set ProductInVehicle 0
-    set ProductInMachine 0
+    set ProductInVehicle "-"
+    set ProductInMachine "-"
   ]
 
 end
 
-to L-CreatingVehiclesFleet [#1]     ; #1 List of Type of Vehicles (1, 2, 3). Order give order of loading. Length give number of vehicles
+to L-CreatingVehiclesFleet [#1]     ; #1 List of Type of Vehicles (T1, T2, T3). Order give order of loading. Length give number of vehicles
                                     ;
   let NumberVehicles length #1
 
@@ -451,18 +476,18 @@ to L-CreatingVehiclesFleet [#1]     ; #1 List of Type of Vehicles (1, 2, 3). Ord
       if(CurretVehicles > 2)[setxy 10 105 - 7 * (CurretVehicles - 2) set heading 0]
       set color Red
       set size 8
-      set VehicleID i + 1
+      set VehicleID (word "AGV-" (i + 1) )
       set VehicleType item i #1
-      set VehicleState 7
-      if (VehicleType = 1) [set VehicleBattery 21 set shape "t1" set VehicleBatteryCharge 21]
-      if (VehicleType = 2) [set VehicleBattery 42 set shape "t2" set VehicleBatteryCharge 42]
-      if (VehicleType = 3) [set VehicleBattery 63 set shape "t3" set VehicleBatteryCharge 63]
+      set VehicleState "WaitingOutside"
+      if (VehicleType = "T1") [set VehicleBattery 21 set shape "t1" set VehicleBatteryCharge 21]
+      if (VehicleType = "T2") [set VehicleBattery 42 set shape "t2" set VehicleBatteryCharge 42]
+      if (VehicleType = "T3") [set VehicleBattery 63 set shape "t3" set VehicleBatteryCharge 63]
       set VehicleDestinationNode 0
-      set VehicleDestinationEntity 4
+      set VehicleDestinationEntity "LoadingStation"
       set VehicleSpeed-X 0.8
       set VehicleSpeed-Y 0
       set VehicleSpeed-Total 0.8
-      set VehicleWithProduct 0
+      set VehicleWithProduct "None"
     ]
     set i i + 1
   ]
@@ -481,10 +506,10 @@ end
 
 to N-UpdateBateryDecharging
 
-  ask vehicles with [VehicleState = 3 or VehicleState = 7][
+  ask vehicles with [VehicleState = "Moving" or VehicleState ="WaitingOutside"][
 
     let loaded ""
-    ifelse(VehicleWithProduct = 0) [set loaded 0][set loaded 1]
+    ifelse(VehicleWithProduct = "None") [set loaded 0][set loaded 1]
 
     set VehicleBatteryCharge VehicleBatteryCharge - ((0.00434 * VehicleSpeed-Total) / 20) - ((0.00434 * 0.5 * Loaded) / 20)   ; Check if it is ok the tick as it is divided by 20
     set VehicleBatteryCharge precision VehicleBatteryCharge 6
@@ -495,7 +520,7 @@ end
 
 to O-MovingToChargers
 
-  ask vehicles with [VehicleState = 5][
+  ask vehicles with [VehicleState = "GoingCharger"][
     set heading precision heading 3
     if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]                                     ; Change according to speed
     set xcor  precision xcor 3
@@ -517,16 +542,16 @@ to P-EnteringChargers
     let dischargelevel ""
     let full ""
     let TempVehicleEntering ""
-    if(count vehicles in-radius 2 with [VehicleState = 5] = 1)[
+    if(count vehicles in-radius 2 with [VehicleState = "GoingCharger"] = 1)[
       ask vehicles in-radius 2 [
         set TempVehicleEntering who
         move-to recharge-station tempRechargerStationVar
-        set VehicleState 6
+        set VehicleState "Charging"
         set dischargelevel ((100 - (VehicleBatteryCharge / VehicleBattery))/ 100)
         set Full VehicleBattery
       ]
       set Rech.WithVehicle TempVehicleEntering
-      set Rech.State 1
+      set Rech.State "StationBusy"
       set Rech.NextCompletion SimulationTime + (121 * exp(2.7 * dischargelevel) * (Full / 21))
     ]
   ]
@@ -542,11 +567,11 @@ to R-ExitingChargers
     if (Rech.NextCompletion <= SimulationTime) [
 
       ask vehicle  Rech.WithVehicle [
-        set VehicleState 3
+        set VehicleState "Moving"
         face turtle 22
         set VehicleBatteryCharge VehicleBattery
       ]
-      set Rech.State 0
+      set Rech.State "StationIdle"
       set Rech.NextCompletion 1000000000
 
 
@@ -558,7 +583,7 @@ end
 
 to V-MovementVehicleOutside
 
-  ask vehicles with [VehicleState = 7][
+  ask vehicles with [VehicleState = "WaitingOutside"][
     ifelse(count vehicles in-cone 12 60 <= 1) [
       forward 0.8
       if (heading = 0) [set VehicleSpeed-X 0 set VehicleSpeed-Y 0.8 set VehicleSpeed-Total 0.8]
@@ -577,16 +602,16 @@ to V-MovementVehicleOutside
   ask vehicles with [xcor >= 9.5 and xcor <= 10.5 and ycor = 15] [move-to turtle 21 set heading 0]      ; turn
 
 
-  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor = 105] [move-to turtle 19 set VehicleState 2 face turtle 0 set VehicleSpeed-X 0 set VehicleSpeed-Y 0 set VehicleSpeed-Total 0]      ; Entering
-  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor >= 14.5 and ycor <= 15.5] [move-to turtle 22 set heading 270 set VehicleState 7]      ; Exiting
+  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor = 105] [move-to turtle 19 set VehicleState "Stand-By" face turtle 0 set VehicleSpeed-X 0 set VehicleSpeed-Y 0 set VehicleSpeed-Total 0]      ; Entering
+  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor >= 14.5 and ycor <= 15.5] [move-to turtle 22 set heading 270 set VehicleState "WaitingOutside"]      ; Exiting
 
 
   let TempVehiclesInTransit count vehicles with [xcor >= 32 and xcor <= 36 and ycor >= 70.5 and ycor <= 102]
-  let TempProductsToBeReleased count products with [ProductState = 0]
+  let TempProductsToBeReleased count products with [ProductState = "To-be-released"]
 
-  ask vehicles with [xcor = 34 and ycor = 105] [if (TempProductsToBeReleased > TempVehiclesInTransit)[set VehicleState 3]]
+  ask vehicles with [xcor = 34 and ycor = 105] [if (TempProductsToBeReleased > TempVehiclesInTransit)[set VehicleState "Moving"]]
 
-  ask vehicles with [xcor = 34 and ycor >= 69.5 and ycor <= 70.5] [move-to turtle 0 set VehicleState 1]
+  ask vehicles with [xcor = 34 and ycor >= 69.5 and ycor <= 70.5] [move-to turtle 0 set VehicleState "WaitingLoading"]
 
 end
 
@@ -598,17 +623,17 @@ end
 
 to X-SetupMachines
 
-  ask machine 1 [set MachineID 1 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 1)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 2 [set MachineID 2 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 2)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 3 [set MachineID 3 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 3)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 4 [set MachineID 4 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 4)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 5 [set MachineID 5 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 5)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
+  ask machine 1 [set MachineID "M1" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP1")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
+  ask machine 2 [set MachineID "M2" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP2")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
+  ask machine 3 [set MachineID "M3" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP3")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
+  ask machine 4 [set MachineID "M4" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP4")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
+  ask machine 5 [set MachineID "M5" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP5")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
 
-  ask machine 6 [set MachineID 6 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 6)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 7 [set MachineID 7 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 7)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 8 [set MachineID 8 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 8)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 9 [set MachineID 9 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 9)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 10 [set MachineID 10 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 10)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
+  ask machine 6 [set MachineID "M6" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP6")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
+  ask machine 7 [set MachineID "M7" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP7")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
+  ask machine 8 [set MachineID "M8" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP8")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
+  ask machine 9 [set MachineID "M9" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP9")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
+  ask machine 10 [set MachineID "M10" set MachineType "Normal" set MachineState "MachineIdle" set MachinePossibleOperations  (list "OP10")  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct "-"]
 
 
 end
@@ -692,11 +717,11 @@ to Z-Layout
   create-turtles 1 [setxy 34 50 set shape "circle" set size 1 set color black set heading 0]          ; Unloading Node
 
 
-  create-Recharge-Stations 1 [setxy 256 80 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 1]         ; Recharging Node R1
-  create-Recharge-Stations 1 [setxy 256 70 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 2]         ; Recharging Node R2
-  create-Recharge-Stations 1 [setxy 256 60 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 3]         ; Recharging Node R3
-  create-Recharge-Stations 1 [setxy 256 50 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 4]         ; Recharging Node R4
-  create-Recharge-Stations 1 [setxy 256 40 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 5]         ; Recharging Node R5
+  create-Recharge-Stations 1 [setxy 256 80 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "None" set Rech.State "StationIdle" set Rech.NextCompletion 1000000000]         ; Recharging Node R1
+  create-Recharge-Stations 1 [setxy 256 70 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "None" set Rech.State "StationIdle" set Rech.NextCompletion 1000000000]         ; Recharging Node R2
+  create-Recharge-Stations 1 [setxy 256 60 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "None" set Rech.State "StationIdle" set Rech.NextCompletion 1000000000]         ; Recharging Node R3
+  create-Recharge-Stations 1 [setxy 256 50 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "None" set Rech.State "StationIdle" set Rech.NextCompletion 1000000000]         ; Recharging Node R4
+  create-Recharge-Stations 1 [setxy 256 40 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "None" set Rech.State "StationIdle" set Rech.NextCompletion 1000000000]         ; Recharging Node R5
 
   create-turtles 1 [setxy 23 70 set shape "Circle" set size 8 set color green + 2 set heading 0]
   create-turtles 1 [setxy 23 50 set shape "Circle" set size 8 set color red + 2 set heading 0]
@@ -791,7 +816,7 @@ SWITCH
 311
 Default
 Default
-1
+0
 1
 -1000
 

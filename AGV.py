@@ -10,10 +10,11 @@ from scipy.spatial.distance import cdist
 
 
 class AGV:
-    def __init__(self, who, x, y, v_x, v_y, heading, battery, vehicle_type, state, product, destination, pos_platoon):
+    def __init__(self, who, x, y, vehicle_id, v_x, v_y, heading, battery, vehicle_type, state, product, destination_node, destination_entity, pos_platoon):
         self.who = who
         self.x = x
         self.y = y
+        self.vehicle_id = vehicle_id
         self.v_x = v_x
         self.v_y = v_y
         self.heading = heading
@@ -21,7 +22,8 @@ class AGV:
         self.vehicle_type = vehicle_type
         self.state = state
         self.product = product
-        self.destination = destination
+        self.destination_node = destination_node
+        self.destination_entity = destination_entity
         self.pos_platoon = pos_platoon
     
     ### GETTERS        
@@ -36,6 +38,9 @@ class AGV:
     
     def get_pos(self):
         return self.x, self.y
+
+    def get_vehicle_id(self):
+        return self.vehicle_id
         
     def get_v_x(self):
         return self.v_x
@@ -55,8 +60,12 @@ class AGV:
     def get_product(self):
         return self.product
 	
-    def get_destination(self):
-        return self.destination
+    def get_destination_node(self):
+        return self.destination_node
+	
+    def get_destination_entity(self):
+        return self.destination_entity
+	
     def get_pos_platoon(self):
         return self.pos_platoon
 	
@@ -87,8 +96,11 @@ class AGV:
     def set_product(self,product):
         self.product = product
     
-    def set_destination(self,destination):
-        self.destination = destination
+    def set_destination_node(self,destination_node):
+        self.destination_node = destination_node
+		
+    def set_destination_entity(self,destination_entity):
+        self.destination_entity = destination_entity
 		
     def set_pos_platoon(self,pos_platoon):
         self.pos_platoon = pos_platoon
@@ -170,3 +182,16 @@ def compute_agvs_distances(agvs):
     distances = cdist(points, points)
 	 # TODO: verify if it it sufficient or if it is needed to add identifiers of AGVs
     return distances
+
+def update_AGVs(AGVs, agvs_info):
+	for row in agvs_info:
+		x_coord = row[0]
+		y_coord = row[1]
+		vehicle_id= row[2]
+		# Find the AGV object with the corresponding index
+		agv = next((agv for agv in AGVs if agv.vehicle_id == vehicle_id), None)
+    
+	# Update the x and y coordinates of the AGV object
+	if agv is not None:
+		agv.x = x_coord
+		agv.y = y_coord

@@ -7,6 +7,7 @@ Created on Wed May 31 14:43:40 2023
 
 ### SETUP of Netlogo
 import pyNetLogo
+import constant as const
 global netlogo
 netlogo = pyNetLogo.NetLogoLink(gui=True) #Show NetLogo GUI
 
@@ -112,6 +113,10 @@ def log_mach_initialInfo():
 #	 return netlogo.report("[MachineValues] of machines")
 def log_station_initialInfo():
 	return netlogo.report("[(list who xcor ycor Rech.StationID)] of recharge-stations")
+def log_mach_allpos():
+	return netlogo.report("[(list xcor ycor)] of machines")
+def log_stations_allpos():
+	return netlogo.report("[(list xcor ycor)] of recharge-stations")
 	
 # All info on vehicles
 def log_veh_initialInfo():
@@ -154,3 +159,15 @@ def log_rech_info():
 	instruction = "[(list Rech.StationId Rech.State Rech.NextCompletion " \
 		"Rech.WithVehicle Rech.ReservedForVehicle )] of recharge-stations"
 	return netlogo.report(instruction)
+
+def command_speed(vehicle_id, speed_x, speed_y):
+	netlogo.command("ask vehicles with [vehicleid = " + str(vehicle_id) + "] [set vehiclespeed-x " +  str(speed_x) + " set vehiclespeed-y " + str(speed_y) + " ]")
+		
+def count_free_station():
+	return netlogo.report("count Recharge-stations with [Rech.state = " + str(const.RECH_IDLE) + "]")
+	
+def count_AGV_waiting():
+	return netlogo.report("count Vehicles with [VehicleState = " + str(const.WAITING_OUTSIDE) + "]")
+
+def command_destination(vehicle_id, destination): #TODO: add destination node
+	netlogo.command("ask vehicles with [vehicleid = " + str(vehicle_id) + "] [ set VehicleDestinationEntity " + str(destination) + "]")

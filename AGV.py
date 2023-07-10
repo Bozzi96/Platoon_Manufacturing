@@ -176,22 +176,26 @@ def compute_agvs_distances(agvs):
     """
 
     # Extract the (x, y) coordinates from AGV objects
-    points = np.array([(agv.get_x, agv.get_y) for agv in agvs])
+    points = np.array([(float(agv.x), float(agv.y)) for agv in agvs], dtype=[('x', float), ('y', float)])
 
     # Compute pairwise distances
     distances = cdist(points, points)
 	 # TODO: verify if it it sufficient or if it is needed to add identifiers of AGVs
     return distances
 
+
 def update_AGVs(AGVs, agvs_info):
-	for row in agvs_info:
-		x_coord = row[0]
-		y_coord = row[1]
-		vehicle_id= row[2]
+	for info in agvs_info:
+		vehicle_id= info[2]
 		# Find the AGV object with the corresponding index
 		agv = next((agv for agv in AGVs if agv.vehicle_id == vehicle_id), None)
     
 	# Update the x and y coordinates of the AGV object
 	if agv is not None:
-		agv.x = x_coord
-		agv.y = y_coord
+		agv.x = info[0]
+		agv.y = info[1]
+		agv.battery = info[5]
+		agv.state = info[6]
+		agv.product = info[7]
+		agv.destination_node = info[8]
+		agv.destination_entity = info[9]

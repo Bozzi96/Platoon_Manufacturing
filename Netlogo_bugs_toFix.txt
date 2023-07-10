@@ -1,3 +1,8 @@
 1) Loading and Unloading unit are not machines
-2) Loading and Uloading unit do not have a processing time (reasonable to have one for platooning control purposes)
-3) Find a "termination" condition (i.e. something to end the program and store the performance index)
+2) Loading and Unloading unit do not have a processing time (reasonable to have one for platooning control purposes)
+3) VehicleDestinationEntity does not have a state for "going to unloading station", which is required for battery scheduling
+4) How to change the VehicleDestinationNode to consider which recharging station is the choosen one for AGV recharging? More in general, what is the VehicleDestinationNode parameter?
+5) Is there a saturation in the speed prompted to AGVs? If not, it should be added
+
+
+PS. Find a "termination" condition (i.e. something to end the program and store the performance index)

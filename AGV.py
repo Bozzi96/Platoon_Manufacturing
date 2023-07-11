@@ -176,10 +176,10 @@ def compute_agvs_distances(agvs):
     """
 
     # Extract the (x, y) coordinates from AGV objects
-    points = np.array([(float(agv.x), float(agv.y)) for agv in agvs], dtype=[('x', float), ('y', float)])
-
+    points = np.array([(float(agv.x), float(agv.y)) for agv in agvs])
+    points_2d = points.reshape(-1, 2)
     # Compute pairwise distances
-    distances = cdist(points, points)
+    distances = cdist(points_2d, points_2d)
 	 # TODO: verify if it it sufficient or if it is needed to add identifiers of AGVs
     return distances
 

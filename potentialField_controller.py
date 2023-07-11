@@ -140,7 +140,7 @@ def calculate_repulsive_force_with_borders(current_position, obstacles, gain=100
 
     return force_x, force_y
 
-def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, gain=100, safe_distance=1, boundary_x_min=30, boundary_x_max=260, boundary_y_min=10, boundary_y_max=110):
+def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, gain=500, safe_distance=1, boundary_x_min=30, boundary_x_max=260, boundary_y_min=10, boundary_y_max=110):
     """
     Calculates the repulsive force from the obstacles, moving obstacles, and rectangular environment borders.
 

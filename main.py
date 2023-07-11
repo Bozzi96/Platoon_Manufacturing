@@ -70,7 +70,7 @@ all_obstacles = ncm.log_mach_allpos()
 all_obstacles = [all_obstacles, ncm.log_stations_allpos()]
 all_obstacles = np.concatenate((all_obstacles[0], all_obstacles[1]), axis=0)
 ### LOOP: Evolution of the system overtime
-safety_radius = 2
+safety_radius = 10
 count = 0
 for tick in range(1,1000):
 	ncm.netlogo.repeat_command('B-Go', 10) # Apply the control each 10 iterations (= 0.5 seconds)
@@ -92,22 +92,22 @@ for tick in range(1,1000):
 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], obstacles, moving_obstacles)
 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1])
-			#TODO: compute the safety maneuver if needed
-# 			distances = compute_agvs_distances(AGVs)
-# 			 # Find indices where distances are less than the threshold
-# 			indices = np.where(distances < safety_radius)
-# 			if len(indices[0]) == 0:
-# 				 conflicts = []
-# 			else:	
-# 				 # Create a list of tuples representing the indices
-# 				conflicts = list(zip(indices[0], indices[1]))
-# 				#TODO: Solve conflicts by prioritizing vehicle with closer due date
-# 				
+			distances = compute_agvs_distances(AGVs)
+			 # Find indices where distances are less than the threshold
+			indices = np.where(distances < safety_radius)
+			if len(indices[0]) == 0:
+ 				 conflicts = []
+			else:	
+ 				 # Create a list of tuples representing the indices
+				conflicts = list(zip(indices[0], indices[1]))
+				#TODO: Solve conflicts by prioritizing vehicle with closer due date
+				
 		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
 			#TODO: plan the recharge decision
 			recharging = agv.recharge_decision(rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			if recharging:
-				agv.command_destination(agv.id, const.DEST_CHARGINGSTATION) # TODO: add which recharging station is the destination amongst the 5 possible options
+				# recharge_dest = find_free_recharge_station() # TODO: add which recharging station is the destination amongst the 5 possible options
+				agv.command_destination(agv.id, const.DEST_CHARGINGSTATION)
 		# TODO: if SAME DESTINATION then merge into platoon
 		#### PLATOON CONTROL: to be chosen and implemented
 	

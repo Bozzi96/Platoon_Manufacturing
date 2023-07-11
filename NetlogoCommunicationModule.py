@@ -161,7 +161,7 @@ def log_rech_info():
 	return netlogo.report(instruction)
 
 def command_speed(vehicle_id, speed_x, speed_y):
-	netlogo.command("ask vehicles with [vehicleid = " + str(vehicle_id) + "] [set vehiclespeed-x " +  str(speed_x) + " set vehiclespeed-y " + str(speed_y) + " ]")
+	netlogo.command("ask vehicles with [vehicleid = " + str(vehicle_id) + "] [set vehiclespeed-x " +  str(speed_x) + " set vehiclespeed-y " + str(speed_y) + "]")
 		
 def count_free_station():
 	return netlogo.report("count Recharge-stations with [Rech.state = " + str(const.RECH_IDLE) + "]")
@@ -169,5 +169,6 @@ def count_free_station():
 def count_AGV_waiting():
 	return netlogo.report("count Vehicles with [VehicleState = " + str(const.WAITING_OUTSIDE) + "]")
 
-def command_destination(vehicle_id, destination): #TODO: add destination node
-	netlogo.command("ask vehicles with [vehicleid = " + str(vehicle_id) + "] [ set VehicleDestinationEntity " + str(destination) + "]")
+def command_destination(vehicle_id, destination, node):
+	netlogo.command("ask vehicles with [vehicleid = " + str(vehicle_id) + "] [ set VehicleDestinationEntity " + str(destination) + " set VehicleDestinationNode " + str(node) + "]")
+	

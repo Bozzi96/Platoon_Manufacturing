@@ -8,8 +8,7 @@ Main file, needed to make Netlogo interact with Python and perform the necessary
 """
 
 
-
-### SETUP Netlogo
+### IMPORT
 import NetlogoCommunicationModule as ncm
 import constant as const
 import numpy as np
@@ -18,6 +17,10 @@ from Product import Product
 from Machine import Machine
 from Station import Station
 from potentialField_controller import potential_field_controller,convert_force_to_speed
+from computations import get_target_position
+
+
+### SETUP Netlogo
 model_path = r'Platoon.nlogo'
 ncm.netlogo.load_model(model_path)
 ncm.netlogo.command('A-Setup')
@@ -83,9 +86,9 @@ for tick in range(1,1000):
 	for agv in moving_agvs:
 		if agv.destination_entity == const.DEST_MACHINE:
 			#TODO: compute the potential field and the correspondent speed
-			target_pos = [104.5, 105.5]
+			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Machines)
 			obstacles = all_obstacles[~np.all(all_obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
-			moving_obstacles = [vehicle for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id]
+			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], obstacles, moving_obstacles)
 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1])
@@ -120,4 +123,3 @@ for tick in range(1,1000):
 	## 2c. Control them as a platoon
 	### END: Control algorithm
 	
-

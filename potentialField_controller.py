@@ -34,7 +34,8 @@ def potential_field_controller(target_position, current_position, obstacles, mov
         tuple: A tuple containing the total force (force_x, force_y) and the angle (in radians).
     """
     attractive_force = calculate_attractive_force(target_position, current_position)
-    repulsive_force = calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles)
+    repulsive_force = calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, \
+																 safe_distance=2)
     total_force = attractive_force + repulsive_force
     angle = math.atan2(total_force[1], total_force[0])
 
@@ -139,7 +140,7 @@ def calculate_repulsive_force_with_borders(current_position, obstacles, gain=100
 
     return force_x, force_y
 
-def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, gain=100, safe_distance=1, boundary_x_min=-10, boundary_x_max=10, boundary_y_min=-10, boundary_y_max=10):
+def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, gain=100, safe_distance=1, boundary_x_min=30, boundary_x_max=260, boundary_y_min=10, boundary_y_max=110):
     """
     Calculates the repulsive force from the obstacles, moving obstacles, and rectangular environment borders.
 
@@ -149,10 +150,10 @@ def calculate_repulsive_force_moving_obstacles(current_position, obstacles, movi
         moving_obstacles (list): A list of moving obstacle positions [(x1, y1), (x2, y2), ...].
         gain (float, optional): The gain factor for repulsive force. Defaults to 100.
         safe_distance (float, optional): The safe distance to maintain from obstacles. Defaults to 1.
-        boundary_x_min (float, optional): The minimum x-coordinate of the environment boundary. Defaults to -10.
-        boundary_x_max (float, optional): The maximum x-coordinate of the environment boundary. Defaults to 10.
-        boundary_y_min (float, optional): The minimum y-coordinate of the environment boundary. Defaults to -10.
-        boundary_y_max (float, optional): The maximum y-coordinate of the environment boundary. Defaults to 10.
+        boundary_x_min (float, optional): The minimum x-coordinate of the environment boundary. Defaults to 30.
+        boundary_x_max (float, optional): The maximum x-coordinate of the environment boundary. Defaults to 260.
+        boundary_y_min (float, optional): The minimum y-coordinate of the environment boundary. Defaults to 10.
+        boundary_y_max (float, optional): The maximum y-coordinate of the environment boundary. Defaults to 110.
 
     Returns:
         tuple: A tuple containing the repulsive force components (force_x, force_y).

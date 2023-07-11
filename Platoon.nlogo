@@ -397,7 +397,21 @@ to J-CreatingProductionOrder
   ]
 
   if (Default = False)[
-    K-CreatingProduct 504 1 0 2000
+        K-CreatingProduct 201 1 0 2000
+    K-CreatingProduct 202 8 1 2000
+    K-CreatingProduct 203 1 2 2000
+    K-CreatingProduct 204 8 3 2000
+    K-CreatingProduct 205 1 4 2000
+    K-CreatingProduct 206 1 5 2000
+    K-CreatingProduct 207 1 6 2000
+    K-CreatingProduct 208 8 7 2000
+    K-CreatingProduct 209 1 8 2000
+    K-CreatingProduct 210 8 9 2000
+    K-CreatingProduct 211 1 0.1 2000
+    K-CreatingProduct 212 8 0.2 2000
+    K-CreatingProduct 213 1 12 2000
+    K-CreatingProduct 214 8 13 2000
+    K-CreatingProduct 215 1 14 2000
   ]
 
 end

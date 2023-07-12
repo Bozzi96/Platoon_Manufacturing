@@ -18,7 +18,29 @@ def get_target_position(entity,node, machines):
 			   x = target_machine.x
 			   y = target_machine.y
 	elif entity == const.DEST_CHARGINGSTATION:
+		#TODO: Handle the case where the destination is a charging station
 	   x=250
 	   y=60
 		
 	return x,y
+
+def solve_conflicts(id1, id2, AGVs, Products):
+	# Retrieve AGVs involved in the conflict
+	agv1 = [agv for agv in AGVs if agv.vehicle_id == id1]
+	agv2 = [agv for agv in AGVs if agv.vehicle_id == id2]
+	# Retrieve the corresponding product
+	prod1 = [prod for prod in Products if agv1[0].product == prod.who]
+	prod2 = [prod for prod in Products if agv2[0].product == prod.who]
+	if len(prod1) == 0:
+		return id1
+	if len(prod2) == 0:
+		return id2
+	if prod1[0].due_date > prod2[0].due_date:
+		return id1
+	elif prod1[0].due_date < prod2[0].due_date:
+		return id2
+	else:
+		if prod1[0].release_order	 > prod2[0].release_order:
+			return id1
+		else:
+			return id2

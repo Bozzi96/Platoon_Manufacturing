@@ -163,6 +163,7 @@ def recharge_decision(self, rech_free, rech_tot, AGV_waiting, AGV_tot):
 	else:
 		return False  # Don't go to recharging station
 	
+
 def compute_agvs_distances(agvs):
     """
     Compute pairwise distances between AGVs.
@@ -171,18 +172,30 @@ def compute_agvs_distances(agvs):
         agvs (list): List of AGVs
 
     Returns:
-        np.ndarray: 2D array containing pairwise distances between AGVs.
-            distances[i, j] contains the distance between agvs[i] and agvs[j].
+        dict: Dictionary containing pairwise distances between AGVs.
+            The keys are tuples of AGV IDs (agv_id1, agv_id2),
+            and the values are the corresponding distances.
     """
 
-    # Extract the (x, y) coordinates from AGV objects
+    # Extract the (x, y) coordinates and IDs from AGV objects
     points = np.array([(float(agv.x), float(agv.y)) for agv in agvs])
     points_2d = points.reshape(-1, 2)
+    agv_ids = [agv.vehicle_id for agv in agvs]
+
     # Compute pairwise distances
     distances = cdist(points_2d, points_2d)
-	 # TODO: verify if it it sufficient or if it is needed to add identifiers of AGVs
-    return distances
 
+    # Create dictionary to store distances with AGV IDs
+    distances_dict = {}
+    n = len(agv_ids)
+    for i in range(n):
+        for j in range(i + 1, n):
+            agv_id1 = agv_ids[i]
+            agv_id2 = agv_ids[j]
+            distance = distances[i, j]
+            distances_dict[(agv_id1, agv_id2)] = distance
+
+    return distances_dict
 
 def update_AGVs(AGVs, agvs_info):
 	for info in agvs_info:

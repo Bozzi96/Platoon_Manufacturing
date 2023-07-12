@@ -20,6 +20,7 @@ Functions:
 """
 
 import math
+tolerance = 0.1  # Small positive tolerance value
 
 def potential_field_controller(target_position, current_position, obstacles, moving_obstacles):
     """
@@ -140,7 +141,7 @@ def calculate_repulsive_force_with_borders(current_position, obstacles, gain=100
 
     return force_x, force_y
 
-def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, gain=500, safe_distance=1, boundary_x_min=30, boundary_x_max=260, boundary_y_min=10, boundary_y_max=110):
+def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, static_gain=100, dynamic_gain=400, safe_distance=1, boundary_x_min=30, boundary_x_max=260, boundary_y_min=10, boundary_y_max=110):
     """
     Calculates the repulsive force from the obstacles, moving obstacles, and rectangular environment borders.
 
@@ -148,7 +149,8 @@ def calculate_repulsive_force_moving_obstacles(current_position, obstacles, movi
         current_position (tuple): The current position (x, y) of the object.
         obstacles (list): A list of obstacle positions [(x1, y1), (x2, y2), ...].
         moving_obstacles (list): A list of moving obstacle positions [(x1, y1), (x2, y2), ...].
-        gain (float, optional): The gain factor for repulsive force. Defaults to 100.
+        static_gain (float, optional): The gain factor for repulsive force from static obstacles. Defaults to 100.
+		  dynamic_gain (float, optional): The gain factor for repulsive force from dynamic obstacles. Defaults to 100.
         safe_distance (float, optional): The safe distance to maintain from obstacles. Defaults to 1.
         boundary_x_min (float, optional): The minimum x-coordinate of the environment boundary. Defaults to 30.
         boundary_x_max (float, optional): The maximum x-coordinate of the environment boundary. Defaults to 260.
@@ -166,34 +168,38 @@ def calculate_repulsive_force_moving_obstacles(current_position, obstacles, movi
         dx = obstacle[0] - current_position[0]
         dy = obstacle[1] - current_position[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)
+        if distance < tolerance:
+            distance = tolerance
 
         if distance < safe_distance:
-            force_x += -gain * (1 / distance - 1 / safe_distance) * (dx / distance ** 3)
-            force_y += -gain * (1 / distance - 1 / safe_distance) * (dy / distance ** 3)
+            force_x += -static_gain * (1 / distance - 1 / safe_distance) * (dx / distance ** 3)
+            force_y += -static_gain * (1 / distance - 1 / safe_distance) * (dy / distance ** 3)
 
     # Calculate repulsive forces from moving obstacles
     for moving_obstacle in moving_obstacles:
         dx = moving_obstacle[0] - current_position[0]
         dy = moving_obstacle[1] - current_position[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)
+        if distance < tolerance:
+            distance = tolerance
 
         if distance < safe_distance:
-            force_x += -gain * (1 / distance - 1 / safe_distance) * (dx / distance ** 3)
-            force_y += -gain * (1 / distance - 1 / safe_distance) * (dy / distance ** 3)
+            force_x += -dynamic_gain * (1 / distance - 1 / safe_distance) * (dx / distance ** 3)
+            force_y += -dynamic_gain * (1 / distance - 1 / safe_distance) * (dy / distance ** 3)
 
     # Calculate repulsive forces from rectangular environment borders
     boundary_force_x = 0
     boundary_force_y = 0
 
     if current_position[0] < boundary_x_min:
-        boundary_force_x += gain / (current_position[0] - boundary_x_min)
+        boundary_force_x += static_gain / (current_position[0] - boundary_x_min)
     elif current_position[0] > boundary_x_max:
-        boundary_force_x += -gain / (current_position[0] - boundary_x_max)
+        boundary_force_x += -static_gain / (current_position[0] - boundary_x_max)
 
     if current_position[1] < boundary_y_min:
-        boundary_force_y += gain / (current_position[1] - boundary_y_min)
+        boundary_force_y += static_gain / (current_position[1] - boundary_y_min)
     elif current_position[1] > boundary_y_max:
-        boundary_force_y += -gain / (current_position[1] - boundary_y_max)
+        boundary_force_y += -static_gain / (current_position[1] - boundary_y_max)
 
     force_x += boundary_force_x
     force_y += boundary_force_y

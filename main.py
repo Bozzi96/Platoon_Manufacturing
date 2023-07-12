@@ -17,7 +17,7 @@ from Product import Product
 from Machine import Machine
 from Station import Station
 from potentialField_controller import potential_field_controller,convert_force_to_speed
-from computations import get_target_position
+from computations import get_target_position, solve_conflicts
 
 
 ### SETUP Netlogo
@@ -73,7 +73,7 @@ all_obstacles = np.concatenate((all_obstacles[0], all_obstacles[1]), axis=0)
 safety_radius = 10
 count = 0
 for tick in range(1,1000):
-	ncm.netlogo.repeat_command('B-Go', 10) # Apply the control each 10 iterations (= 0.5 seconds)
+	ncm.netlogo.repeat_command('B-Go', 5) # Apply the control each 10 iterations (= 0.5 seconds)
 	# Retrieve values from netlogo and update the structures that store data
 	agvs_info = ncm.log_veh_info()
 	update_AGVs(AGVs,agvs_info)
@@ -85,23 +85,27 @@ for tick in range(1,1000):
 	moving_agvs = [agv for agv in AGVs if agv.state == const.MOVING]
 	for agv in moving_agvs:
 		if agv.destination_entity == const.DEST_MACHINE:
-			#TODO: compute the potential field and the correspondent speed
-			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Machines)
+			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Machines) #TODO: compute the target position when the destination is not a machine
 			obstacles = all_obstacles[~np.all(all_obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
 			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], obstacles, moving_obstacles)
 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1])
 			distances = compute_agvs_distances(AGVs)
-			 # Find indices where distances are less than the threshold
-			indices = np.where(distances < safety_radius)
-			if len(indices[0]) == 0:
- 				 conflicts = []
-			else:	
- 				 # Create a list of tuples representing the indices
-				conflicts = list(zip(indices[0], indices[1]))
-				#TODO: Solve conflicts by prioritizing vehicle with closer due date
-				
+			# Find AGV conflicts based on distances
+			threshold = safety_radius
+			conflicts = []
+			for agv_ids, distance in distances.items():
+			    agv_id1, agv_id2 = agv_ids
+			    if distance < threshold and agv_id1 != agv_id2:
+			        conflicts.append(agv_ids)
+			
+			# Solve conflicts
+			for conflict in conflicts:
+				   agv_id1, agv_id2 = conflict
+				   agv_to_stop = solve_conflicts(agv_id1, agv_id2, AGVs, Products)
+				   ncm.command_speed(agv_to_stop, 0.01, 0.01)
+
 		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
 			#TODO: plan the recharge decision
 			recharging = agv.recharge_decision(rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor

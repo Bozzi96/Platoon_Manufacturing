@@ -45,9 +45,8 @@ def solve_conflicts(id1, id2, AGVs, Products):
 		else:
 			return id2
 		
-def find_free_recharging_stations(Stations):
+def find_free_recharging_station(Stations):
 	for station in Stations:
 		if station.state == const.RECH_IDLE:
 			return station.station_id
-		
 	return 0

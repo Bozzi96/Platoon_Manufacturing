@@ -128,7 +128,7 @@ def distance_between_agvs(agv1: AGV, agv2: AGV) -> float:
 
 HIGH_CHARGE = 80
 LOW_CHARGE = 20
-def recharge_decision(self, rech_free, rech_tot, AGV_waiting, AGV_tot):
+def recharge_decision(agv, rech_free, rech_tot, AGV_waiting, AGV_tot):
 	"""
 	Function to decide whether it is convenient or not to go to a recharging station
 
@@ -150,14 +150,14 @@ def recharge_decision(self, rech_free, rech_tot, AGV_waiting, AGV_tot):
 		False: don't go to recharging station
 
 	"""
-	if self.battery > HIGH_CHARGE:
+	if agv.battery > HIGH_CHARGE:
 		return False
-	if self.battery < LOW_CHARGE:
+	if agv.battery < LOW_CHARGE:
 		return True
 	Kr = 0.25 # gain for importance of number of free recharging station
 	Ka = 0.25 # gain for importance of number of agv waiting in the queue
 	Kb = 0.5 # gain for importance of current state of charge of battery
-	decision = Kr*rech_free/rech_tot + Ka*AGV_waiting/AGV_tot + (Kb/self.vehicle_type)*(100-self.battery)/100
+	decision = Kr*rech_free/rech_tot + Ka*AGV_waiting/AGV_tot + (Kb/agv.vehicle_type)*(100-agv.battery)/100
 	if decision > 0.5:
 		return True # Go to recharging station
 	else:
@@ -207,7 +207,7 @@ def update_AGVs(AGVs, agvs_info):
 	if agv is not None:
 		agv.x = info[0]
 		agv.y = info[1]
-		agv.battery = info[5]
+		agv.battery = (info[5]/(21*agv.vehicle_type))*100 # Get the battery in %
 		agv.state = info[6]
 		agv.product = info[7]
 		agv.destination_node = info[8]

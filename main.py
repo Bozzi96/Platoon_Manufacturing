@@ -17,7 +17,7 @@ from Product import Product
 from Machine import Machine
 from Station import Station
 from potentialField_controller import potential_field_controller,convert_force_to_speed
-from computations import get_target_position, solve_conflicts, find_free_recharge_station
+from computations import get_target_position, solve_conflicts, find_free_recharging_station
 
 
 ### SETUP Netlogo
@@ -91,7 +91,7 @@ for tick in range(1,1000):
 			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
-			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1])
+			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			### END: Potential field control
 			### BEGIN: Emergency control
 			distances = compute_agvs_distances(AGVs)
@@ -107,15 +107,15 @@ for tick in range(1,1000):
 			for conflict in conflicts:
 				   agv_id1, agv_id2 = conflict
 				   agv_to_stop = solve_conflicts(agv_id1, agv_id2, AGVs, Products)
-				   ncm.command_speed(agv_to_stop, 0.0001, 0.0001)
+				   ncm.command_speed(agv_to_stop, 0.0001, 0.0001, agv.product) # Stop vehicle; speed = 0 gives error, so put a very low number
 			### END: Emergency control
-			### BEGIN: Recharging decision
-		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
+			### BEGIN: Recharging decision after passing through the unloading unit
+		if agv.destination_entity == const.DEST_EXITINGVEHICLE:
 			#TODO: plan the recharge decision
-			recharging = agv.recharge_decision(rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
+			recharging = agv.recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			if recharging:
-				recharge_dest = find_free_recharge_station(Stations) # TODO: add which recharging station is the destination amongst the 5 possible options
-				agv.command_destination(agv.id, const.DEST_CHARGINGSTATION, recharge_dest)
+				recharge_dest = find_free_recharging_station(Stations)
+				agv.command_destination(agv.id, const.DEST_CHARGINGSTATION, recharge_dest+11) # +11 needed to "fix" the offset between rech_id and destination node
 			### END: Recharging decision
 			### BEGIN: Platoon control for AGVs who share destination
 			# TODO: if SAME DESTINATION then merge into platoon

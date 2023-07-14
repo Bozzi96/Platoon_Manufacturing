@@ -8,6 +8,7 @@ Created on Wed May 31 14:43:40 2023
 ### SETUP of Netlogo
 import pyNetLogo
 import constant as const
+import math
 global netlogo
 netlogo = pyNetLogo.NetLogoLink(gui=True) #Show NetLogo GUI
 
@@ -160,7 +161,18 @@ def log_rech_info():
 		"Rech.WithVehicle Rech.ReservedForVehicle )] of recharge-stations"
 	return netlogo.report(instruction)
 
-def command_speed(vehicle_id, speed_x, speed_y):
+MAX_SPEED_PAYLOAD = 0.5
+MAX_SPEED_NO_PAYLOAD = 0.8
+def command_speed(vehicle_id, speed_x, speed_y, payload):
+	total_speed = math.sqrt(speed_x**2 + speed_y**2)
+	if total_speed > MAX_SPEED_PAYLOAD and payload > 0: #Speed exceeds the maximum speed for AGV with payload
+		scaling_factor = MAX_SPEED_PAYLOAD/total_speed
+		speed_x = speed_x * scaling_factor
+		speed_y = speed_y * scaling_factor
+	if total_speed > MAX_SPEED_NO_PAYLOAD and payload == 0: #Speed exceeds the maximum speed for AGV without payload
+		scaling_factor = MAX_SPEED_NO_PAYLOAD/total_speed
+		speed_x = speed_x * scaling_factor
+		speed_y = speed_y * scaling_factor
 	netlogo.command("ask vehicles with [vehicleid = " + str(vehicle_id) + "] [set vehiclespeed-x " +  str(speed_x) + " set vehiclespeed-y " + str(speed_y) + "]")
 		
 def count_free_station():

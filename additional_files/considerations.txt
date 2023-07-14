@@ -3,5 +3,4 @@ Questions and recommendations about coding in Python and in Netlogo.
 
 
 ---Netlogo---
-1) How the attribute "batterycharge" works? Does it go from 0 % to 100%? Or does it go from 0 to 21/42/63 based on the battery capacity of vehicles? It would be better if any vehicle will have the same battery discharging (i.e. from 0 to 100%), but with different time (a factor dependent on the number of batteries)
-2) How much battery is needed, on average, for a product? (20-30%?)
+1) How much battery is needed, on average, for a product? (20-30%?) -----> TOO FEW, like 1%...Maybe it would be better to make the battery discharge also when the vehicle is still?

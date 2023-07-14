@@ -86,7 +86,7 @@ for tick in range(1,1000):
 	for agv in moving_agvs:
 		if agv.destination_entity == const.DEST_MACHINE:
 			### BEGIN: Potential field control
-			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Machines) #TODO: compute the target position when the destination is not a machine
+			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Machines)
 			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
 			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
@@ -119,6 +119,11 @@ for tick in range(1,1000):
 			### END: Recharging decision
 			### BEGIN: Platoon control for AGVs who share destination
 			# TODO: if SAME DESTINATION then merge into platoon
+		if agv.destination_entity == const.DEST_CHARGINGSTATION:
+			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Stations)
+		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
+			target_pos = (34.0,50.0)
+			
 			#### PLATOON CONTROL: to be chosen and implemented
 			### END: Platoon control for AGVs who share destination
 ###### END: Control algorithm

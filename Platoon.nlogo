@@ -203,9 +203,19 @@ to D-MovingVehicles
         ask product VehicleWithProduct [move-to turtle ProductInVehicle]
       ]
       if (VehicleWithProduct = 0)[
-        if (count vehicles in-cone 25 70 < 2) [forward 0.8]                                   ; Change according to speed
+        set VehicleSpeed-Total sqrt (VehicleSpeed-X ^ 2 + VehicleSpeed-Y ^ 2)
+
+        if(VehicleSpeed-X >= 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+        if(VehicleSpeed-X < 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (acos (VehicleSpeed-X / VehicleSpeed-Total))]
+        if(VehicleSpeed-X < 0 and VehicleSpeed-Y < 0 ) [set heading 0 - 90 + (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+        if(VehicleSpeed-X >= 0 and VehicleSpeed-Y < 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+
+
+        set heading precision heading 3
+        if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]                                    ; Change according to speed
         set xcor  precision xcor 3
         set ycor  precision ycor 3
+        ask product VehicleWithProduct [move-to turtle ProductInVehicle]
       ]
     ]
   ][

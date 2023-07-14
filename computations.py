@@ -19,9 +19,12 @@ def get_target_position(entity,node, machines):
 			   y = target_machine.y
 	elif entity == const.DEST_CHARGINGSTATION:
 		#TODO: Handle the case where the destination is a charging station
-	   x=250
-	   y=60
-		
+		target_station = next((station for station in machines if (station.station_id+11) == node), None)
+		x = target_station.x
+		y = target_station.y
+	else: # Going to unloading station		
+		x = 34
+		y = 50
 	return x,y
 
 def solve_conflicts(id1, id2, AGVs, Products):

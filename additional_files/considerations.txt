@@ -4,3 +4,4 @@ Questions and recommendations about coding in Python and in Netlogo.
 
 ---Netlogo---
 1) How much battery is needed, on average, for a product? (20-30%?) -----> TOO FEW, like 1%...Maybe it would be better to make the battery discharge also when the vehicle is still?
+2) Add a standby discharge. Estimate the standby current (e.g. 10mA), and with the capacity of the whole battery the discharging instant by instant can be retrieved.

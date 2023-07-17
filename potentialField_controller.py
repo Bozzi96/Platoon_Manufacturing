@@ -34,9 +34,9 @@ def potential_field_controller(target_position, current_position, obstacles, mov
     Returns:
         tuple: A tuple containing the total force (force_x, force_y) and the angle (in radians).
     """
-    attractive_force = calculate_attractive_force(target_position, current_position)
+    attractive_force = calculate_attractive_force(target_position, current_position, gain=20)
     repulsive_force = calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, \
-																 safe_distance=5)
+																 safe_distance=10, static_gain=100, dynamic_gain=1500)
     total_force = attractive_force + repulsive_force
     angle = math.atan2(total_force[1], total_force[0])
 
@@ -141,7 +141,7 @@ def calculate_repulsive_force_with_borders(current_position, obstacles, gain=100
 
     return force_x, force_y
 
-def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, static_gain=30, dynamic_gain=300, safe_distance=1, boundary_x_min=30, boundary_x_max=260, boundary_y_min=10, boundary_y_max=110):
+def calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, static_gain=100, dynamic_gain=100, safe_distance=1, boundary_x_min=30, boundary_x_max=260, boundary_y_min=10, boundary_y_max=110):
     """
     Calculates the repulsive force from the obstacles, moving obstacles, and rectangular environment borders.
 

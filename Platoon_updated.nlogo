@@ -41,7 +41,7 @@ Vehicles-Own [
   VehicleWithProduct          ; Indicates the product being carried/ "0" Otherwise
   VehicleBattery              ; Type 1 = 21, Type 2 = 42, Type 3 = 63
   VehicleDestinationNode      ; Indicates the node of destination
-  VehicleDestinationEntity    ; Indicates the entity of destination. Could be: Machine = 1, ExitingVehicle = 2, ChargingStation = 3, LoadingStation = 4
+  VehicleDestinationEntity    ; Indicates the entity of destination. Could be: Machine = 1, ExitingVehicle = 2, ChargingStation = 3, LoadingStation = 4, UnloadingStation = 5, GettingIn = 6
   VehicleSpeed-X              ; Indicates the speed in the x-axis
   VehicleSpeed-Y              ; Indicates the speed in the y-axis
   VehicleSpeed-Total          ; Indicates the speed in the heading direction
@@ -189,23 +189,35 @@ to D-MovingVehicles
     ask vehicles with [VehicleState = 3][
       if (VehicleWithProduct != 0)[
         set VehicleSpeed-Total sqrt (VehicleSpeed-X ^ 2 + VehicleSpeed-Y ^ 2)
+        if (VehicleSpeed-Total != 0) [
+          if(VehicleSpeed-X >= 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+          if(VehicleSpeed-X < 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (acos (VehicleSpeed-X / VehicleSpeed-Total))]
+          if(VehicleSpeed-X < 0 and VehicleSpeed-Y < 0 ) [set heading 0 - 90 + (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+          if(VehicleSpeed-X >= 0 and VehicleSpeed-Y < 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
 
-        if(VehicleSpeed-X >= 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
-        if(VehicleSpeed-X < 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (acos (VehicleSpeed-X / VehicleSpeed-Total))]
-        if(VehicleSpeed-X < 0 and VehicleSpeed-Y < 0 ) [set heading 0 - 90 + (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
-        if(VehicleSpeed-X >= 0 and VehicleSpeed-Y < 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
 
-
-        set heading precision heading 3
-        if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]                                    ; Change according to speed
-        set xcor  precision xcor 3
-        set ycor  precision ycor 3
-        ask product VehicleWithProduct [move-to turtle ProductInVehicle]
+          set heading precision heading 3
+          if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]                                    ; Change according to speed
+          set xcor  precision xcor 3
+          set ycor  precision ycor 3
+          ask product VehicleWithProduct [move-to turtle ProductInVehicle]
+        ]
       ]
       if (VehicleWithProduct = 0)[
-        if (count vehicles in-cone 25 70 < 2) [forward 0.8]                                   ; Change according to speed
-        set xcor  precision xcor 3
-        set ycor  precision ycor 3
+        set VehicleSpeed-Total sqrt (VehicleSpeed-X ^ 2 + VehicleSpeed-Y ^ 2)
+        if (VehicleSpeed-Total != 0)[
+          if(VehicleSpeed-X >= 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+          if(VehicleSpeed-X < 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (acos (VehicleSpeed-X / VehicleSpeed-Total))]
+          if(VehicleSpeed-X < 0 and VehicleSpeed-Y < 0 ) [set heading 0 - 90 + (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+          if(VehicleSpeed-X >= 0 and VehicleSpeed-Y < 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+
+
+          set heading precision heading 3
+          if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]                                    ; Change according to speed
+          set xcor  precision xcor 3
+          set ycor  precision ycor 3
+          ask product VehicleWithProduct [move-to turtle ProductInVehicle]
+        ]
       ]
     ]
   ][
@@ -303,7 +315,7 @@ to F-MachineExit
       ask vehicle MachineWithVehicle[
         set VehicleState 3
         set VehicleDestinationNode item 0 TemporalDestNodeVar
-        ifelse (VehicleDestinationNode = 11) [set VehicleDestinationEntity 5][set VehicleDestinationEntity 1] ;added 17/07
+        ifelse (VehicleDestinationNode = 11) [set VehicleDestinationEntity 5][set VehicleDestinationEntity 1]
         ifelse (MachineTemp <= 5)[
           set VehicleSpeed-X 0
           set VehicleSpeed-Y -0.8
@@ -592,7 +604,7 @@ to V-MovementVehicleOutside
 
 
   ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor = 105] [move-to turtle 19 set VehicleState 2 face turtle 0 set VehicleSpeed-X 0 set VehicleSpeed-Y 0 set VehicleSpeed-Total 0]      ; Entering
-  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor >= 14.5 and ycor <= 15.5] [move-to turtle 22 set heading 270 set VehicleState 7]      ; Exiting
+  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor >= 14.5 and ycor <= 15.5] [move-to turtle 22 set heading 270 set VehicleState 7 set VehicleDestinationEntity 6]      ; Exiting
 
 
   let TempVehiclesInTransit count vehicles with [xcor >= 32 and xcor <= 36 and ycor >= 70.5 and ycor <= 102]

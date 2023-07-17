@@ -12,7 +12,7 @@ Main file, needed to make Netlogo interact with Python and perform the necessary
 import NetlogoCommunicationModule as ncm
 import constant as const
 import numpy as np
-from AGV import AGV,distance_between_agvs, update_AGVs, compute_agvs_distances, recharge_decision
+from AGV import AGV, update_AGVs, compute_agvs_distances, recharge_decision
 from Product import Product
 from Machine import Machine
 from Station import Station
@@ -24,8 +24,7 @@ from computations import get_target_position, solve_conflicts, find_free_recharg
 model_path = r'Platoon.nlogo'
 ncm.netlogo.load_model(model_path)
 ncm.netlogo.command('A-Setup')
-ncm.netlogo.repeat_command('B-go', 100)
-
+ncm.netlogo.repeat_command('B-go', 10)
 INF= 100000
 ##### BEGIN: SETUP of static objects and parameters (no. AGVs, machines position, etc...)
 N = int(ncm.netlogo.report("count vehicles")) # no. of AGVs
@@ -70,10 +69,11 @@ obstacles = ncm.log_mach_allpos()
 obstacles = [obstacles, ncm.log_stations_allpos()]
 obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
 ### LOOP: Evolution of the system overtime
-safety_radius = 10
+safety_radius = 3
+safety_distance = 5
 count = 0
 for tick in range(1,1000):
-	ncm.netlogo.repeat_command('B-Go', 10) # Apply the control each 10 iterations (= 0.5 seconds)
+	ncm.netlogo.repeat_command('B-Go', 5) # Apply the control each 10 iterations (= 0.5 seconds)
 	# Retrieve values from netlogo and update the structures that store data
 	agvs_info = ncm.log_veh_info()
 	update_AGVs(AGVs,agvs_info)
@@ -93,26 +93,9 @@ for tick in range(1,1000):
 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			### END: Potential field control
-			### BEGIN: Emergency control
-			distances = compute_agvs_distances(AGVs)
-			# Find AGV conflicts based on distances
-			threshold = safety_radius
-			conflicts = []
-			for agv_ids, distance in distances.items():
-			    agv_id1, agv_id2 = agv_ids
-			    if distance < threshold and agv_id1 != agv_id2:
-			        conflicts.append(agv_ids)
-			
-			# Solve conflicts
-			for conflict in conflicts:
-				   agv_id1, agv_id2 = conflict
-				   agv_to_stop = solve_conflicts(agv_id1, agv_id2, AGVs, Products)
-				   ncm.command_speed(agv_to_stop, 0.0001, 0.0001, agv.product) # Stop vehicle; speed = 0 gives error, so put a very low number
-			### END: Emergency control
 			### BEGIN: Recharging decision after passing through the unloading unit
 		if agv.destination_entity == const.DEST_EXITINGVEHICLE:
-			#TODO: plan the recharge decision
-			recharging = agv.recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
+			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			if recharging:
 				recharge_dest = find_free_recharging_station(Stations)
 				agv.command_destination(agv.id, const.DEST_CHARGINGSTATION, recharge_dest+11) # +11 needed to "fix" the offset between rech_id and destination node
@@ -123,8 +106,26 @@ for tick in range(1,1000):
 			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Stations)
 		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
 			target_pos = (34.0,50.0)
+			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
+			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
+			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			
 			#### PLATOON CONTROL: to be chosen and implemented
 			### END: Platoon control for AGVs who share destination
+	### BEGIN: Emergency control
+	distances = compute_agvs_distances(moving_agvs)
+	# Find AGV conflicts based on distances
+	conflicts = []
+	for agv_ids, distance in distances.items():
+	    agv_id1, agv_id2 = agv_ids
+	    if distance < safety_distance and agv_id1 != agv_id2:
+	        conflicts.append(agv_ids)
+	
+	# Solve conflicts
+	for conflict in conflicts:
+		   agv_id1, agv_id2 = conflict
+		   agv_to_stop = solve_conflicts(agv_id1, agv_id2, AGVs, Products)
+		   ncm.command_speed(agv_to_stop, 0.0001, 0.0001, agv.product) # Stop vehicle; speed = 0 gives error, so put a very low number
+	### END: Emergency control
 ###### END: Control algorithm
 	

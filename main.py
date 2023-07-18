@@ -72,7 +72,7 @@ obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
 safety_radius = 3
 safety_distance = 5
 count = 0
-for tick in range(1,1000):
+for tick in range(1,2000):
 	ncm.netlogo.repeat_command('B-Go', 5) # Apply the control each 10 iterations (= 0.5 seconds)
 	# Retrieve values from netlogo and update the structures that store data
 	agvs_info = ncm.log_veh_info()
@@ -95,15 +95,19 @@ for tick in range(1,1000):
 			### END: Potential field control
 			### BEGIN: Recharging decision after passing through the unloading unit
 		if agv.destination_entity == const.DEST_EXITINGVEHICLE:
+			agv.battery = 18
 			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			if recharging:
 				recharge_dest = find_free_recharging_station(Stations)
-				agv.command_destination(agv.id, const.DEST_CHARGINGSTATION, recharge_dest+11) # +11 needed to "fix" the offset between rech_id and destination node
+				ncm.command_destination(agv.vehicle_id, const.DEST_CHARGINGSTATION, recharge_dest+11) # +11 needed to "fix" the offset between rech_id and destination node
 			### END: Recharging decision
 			### BEGIN: Platoon control for AGVs who share destination
 			# TODO: if SAME DESTINATION then merge into platoon
 		if agv.destination_entity == const.DEST_CHARGINGSTATION:
 			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Stations)
+			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
+			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
+			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
 			target_pos = (34.0,50.0)
 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)

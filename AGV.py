@@ -10,7 +10,7 @@ from scipy.spatial.distance import cdist
 
 
 class AGV:
-    def __init__(self, who, x, y, vehicle_id, v_x, v_y, heading, battery, vehicle_type, state, product, destination_node, destination_entity, pos_platoon):
+    def __init__(self, who, x, y, vehicle_id, v_x, v_y, heading, battery, vehicle_type, state, product, destination_node, destination_entity, platoon_type, platoon_position):
         self.who = who
         self.x = x
         self.y = y
@@ -24,7 +24,8 @@ class AGV:
         self.product = product
         self.destination_node = destination_node
         self.destination_entity = destination_entity
-        self.pos_platoon = pos_platoon
+        self.platoon_type = platoon_type
+        self.platoon_position = platoon_position
     
     ### GETTERS        
     def get_who(self):
@@ -65,9 +66,12 @@ class AGV:
 	
     def get_destination_entity(self):
         return self.destination_entity
-	
-    def get_pos_platoon(self):
-        return self.pos_platoon
+    
+    def get_platoon_type(self):
+        return self.platoon_type
+    
+    def get_platoon_position(self):
+        return self.platoon_position
 	
 	
     ### SETTERS
@@ -101,9 +105,12 @@ class AGV:
 		
     def set_destination_entity(self,destination_entity):
         self.destination_entity = destination_entity
-		
-    def set_pos_platoon(self,pos_platoon):
-        self.pos_platoon = pos_platoon
+
+    def set_platoon_type(self,platoon_type):
+       self.platoon_type = platoon_type
+	   
+    def set_platoon_position(self,platoon_position):
+        self.platoon_position = platoon_position
     
 
 HIGH_CHARGE = 80
@@ -192,3 +199,5 @@ def update_AGVs(AGVs, agvs_info):
 			agv.product = info[7]
 			agv.destination_node = info[8]
 			agv.destination_entity = info[9]
+			agv.platoon_type = 0 # reset platoon type
+			agv.platoon_position = 0 # reset platoon position

@@ -70,11 +70,12 @@ obstacles = ncm.log_mach_allpos()
 obstacles = [obstacles, ncm.log_stations_allpos()]
 obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
 ### LOOP: Evolution of the system overtime
-safety_radius = 3
-safety_distance = 5
+safety_distance = 15
 count = 0
 for tick in range(1,2000):
 	ncm.netlogo.repeat_command('B-Go', 5) # Apply the control each 10 iterations (= 0.5 seconds)
+	if tick >= 100:
+		prova = 1
 	# Retrieve values from netlogo and update the structures that store data
 	agvs_info = ncm.log_veh_info()
 	update_AGVs(AGVs,agvs_info)
@@ -125,7 +126,7 @@ for tick in range(1,2000):
 		# Assign the position attribute in increasing order based on the sorted indices
 		for position, index in enumerate(sorted_indices):
 			   platoon_unloading[index].position = position + 1
-		platoon_unloading = sorted(platoon_unloading, key=lambda agv: agv.platoon_position) # Sort platoon based on platoon_position
+		platoon_unloading.sort(key=lambda agv: agv.platoon_position) # Sort platoon based on platoon_position
 	   # Compute ideal speed for each element of the platoon
 		target_pos = (34.0, 50.0)
 		unloading_processing = 50 # Unloading processing time, to be put at the beginning of the main
@@ -138,7 +139,7 @@ for tick in range(1,2000):
 			time_from_unloading = expected_arrival_time + unloading_processing # compute the time for the unloading machine to be available
 			speed_tot = distance_from_unloading[index]/ time_from_unloading # compute the average speed (assumed constant) needed to arrive at the destination at the precise time
 			speed_angle = np.degrees(np.arctan2(agv.y - target_pos[1], agv.x - target_pos[0])) # compute the angle with respect to the unloading machine
-			ncm.command_speed(agv.vehicle_id, speed_tot*np.sin(speed_angle),speed_tot*np.cos(speed_angle) , agv.product)
+			ncm.command_speed(agv.vehicle_id, speed_tot*np.cos(speed_angle), speed_tot*np.sin(speed_angle) , agv.product)
 			expected_arrival_time = time_from_unloading # update the expected arrival time for the following element of the platoon
 			### END: Platoon control for AGVs who share destination
 	### BEGIN: Emergency control

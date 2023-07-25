@@ -70,12 +70,10 @@ obstacles = ncm.log_mach_allpos()
 obstacles = [obstacles, ncm.log_stations_allpos()]
 obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
 ### LOOP: Evolution of the system overtime
-safety_distance = 15
+safety_distance = 5
 count = 0
 for tick in range(1,2000):
-	ncm.netlogo.repeat_command('B-Go', 5) # Apply the control each 10 iterations (= 0.5 seconds)
-	if tick >= 100:
-		prova = 1
+	ncm.netlogo.repeat_command('B-Go', 10) # Apply the control each 10 iterations (= 0.5 seconds)
 	# Retrieve values from netlogo and update the structures that store data
 	agvs_info = ncm.log_veh_info()
 	update_AGVs(AGVs,agvs_info)
@@ -111,9 +109,9 @@ for tick in range(1,2000):
 			agv.platoon_type = const.PLATOON_CHARGING # add agv to platoon 
 		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
 			target_pos = (34.0,50.0)
-			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
-			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
-			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
+# 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
+# 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
+# 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			agv.platoon_type = const.PLATOON_UNLOADING # add agv to platoon 
 			#### PLATOON CONTROL: to be chosen and implemented
 			### END: Handle AGVs who have different destinations (charging stations, unloading unit)
@@ -125,11 +123,13 @@ for tick in range(1,2000):
 		sorted_indices = np.argsort(distance_from_unloading) # Sort the AGVs based on their distances
 		# Assign the position attribute in increasing order based on the sorted indices
 		for position, index in enumerate(sorted_indices):
-			   platoon_unloading[index].position = position + 1
+			   platoon_unloading[index].platoon_position = position + 1
 		platoon_unloading.sort(key=lambda agv: agv.platoon_position) # Sort platoon based on platoon_position
 	   # Compute ideal speed for each element of the platoon
 		target_pos = (34.0, 50.0)
 		unloading_processing = 50 # Unloading processing time, to be put at the beginning of the main
+		static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
+		moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != platoon_unloading[0].vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
 		potential_force = potential_field_controller(target_pos, [platoon_unloading[0].x, platoon_unloading[0].y], static_obstacles, moving_obstacles)
 		potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
 		ncm.command_speed(platoon_unloading[0].vehicle_id, potential_speed[0], potential_speed[1], platoon_unloading[0].product)
@@ -152,10 +152,19 @@ for tick in range(1,2000):
 	        conflicts.append(agv_ids)
 	
 	# Solve conflicts
+	# TODO: solve conflicts in a smart way, avoiding collision in all possible scenarios
 	for conflict in conflicts:
 		   agv_id1, agv_id2 = conflict
-		   agv_to_stop = solve_conflicts(agv_id1, agv_id2, AGVs, Products)
+		   agv_to_stop, agv_to_prioritize = solve_conflicts(agv_id1, agv_id2, AGVs, Products)
+		   AGV_stop = next((agv for agv in AGVs if agv.vehicle_id == agv_to_stop), None)
+		   AGV_priority = next((agv for agv in AGVs if agv.vehicle_id == agv_to_prioritize), None)
 		   ncm.command_speed(agv_to_stop, 0.0001, 0.0001, agv.product) # Stop vehicle; speed = 0 gives error, so put a very low number
+		   ## Recompute the potential field controller for the other vehicle
+# 		   target_pos = get_target_position(agv.destination_entity, agv.destination_node, Machines)
+# 		   static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
+# 		   potential_force = potential_field_controller(target_pos, [AGV_stop.x, AGV_stop.y], static_obstacles, [[AGV_priority.x, AGV_priority.y]] )
+# 		   potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
+# 		   ncm.command_speed(agv_to_prioritize, potential_speed[0], potential_speed[1], agv.product)
 	### END: Emergency control
 ###### END: Control algorithm
 	

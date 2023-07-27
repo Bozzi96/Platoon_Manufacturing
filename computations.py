@@ -19,7 +19,7 @@ def get_target_position(entity,node, machines):
 			   y = target_machine.y
 	elif entity == const.DEST_CHARGINGSTATION:
 		#TODO: Handle the case where the destination is a charging station
-		target_station = next((station for station in machines if (station.station_id+11) == node), None)
+		target_station = next((station for station in machines if (station.station_id) == node), None)
 		x = target_station.x
 		y = target_station.y
 	else: # Going to unloading station		
@@ -75,4 +75,8 @@ def find_free_recharging_station(Stations):
 	for station in Stations:
 		if station.state == const.RECH_IDLE:
 			return station.station_id
-	return 0
+	# No stations is free, find the one that finishes first
+	first_available = min(Stations, key=lambda station: station.completion)
+	return first_available
+#TODO: if all recharging stations are occupied, treat AGVs moving to recharging stations ...
+#... as AGVs moving to unloading unit --> PLATOON

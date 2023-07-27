@@ -4,7 +4,10 @@ Created on Wed May 31 13:18:30 2023
 
 @author: bozzi
 
-Main file, needed to make Netlogo interact with Python and perform the necessary step to plan trajectories, schedule AGVs and 
+Main file, needed to make Netlogo interact with Python and to:
+	- plan trajectories
+	- schedule AGVs recharging
+	- form platoons to achieve energy efficient movement to shared resources
 """
 
 
@@ -25,7 +28,7 @@ from computations import get_target_position, solve_conflicts, find_free_recharg
 model_path = r'Platoon.nlogo'
 ncm.netlogo.load_model(model_path)
 ncm.netlogo.command('A-Setup')
-ncm.netlogo.repeat_command('B-go', 10)
+ncm.netlogo.repeat_command('B-go', 10) # Make the simulation evolve a bit to retrive reliable data
 INF= 100000
 ##### BEGIN: SETUP of static objects and parameters (no. AGVs, machines position, etc...)
 N = int(ncm.netlogo.report("count vehicles")) # no. of AGVs
@@ -97,21 +100,30 @@ for tick in range(1,2000):
 		if agv.destination_entity == const.DEST_EXITINGVEHICLE:
 			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			if recharging:
+				agv.destination_entity = const.DEST_CHARGINGSTATION
 				recharge_dest = find_free_recharging_station(Stations)
-				ncm.command_destination(agv.vehicle_id, const.DEST_CHARGINGSTATION, recharge_dest+11) # +11 needed to "fix" the offset between rech_id and destination node
+				agv.destination_node = recharge_dest
+				ncm.command_destination(agv.vehicle_id, const.DEST_CHARGINGSTATION, recharge_dest) # Maybe a +/- 11 is needed to "fix" the offset between rech_id and destination node
 			### END: Recharging decision
 			### BEGIN: Handle AGVs who have different destinations (charging stations, unloading unit)
 		if agv.destination_entity == const.DEST_CHARGINGSTATION:
 			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Stations)
+			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
+			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			agv.platoon_type = const.PLATOON_CHARGING # add agv to platoon 
+		if agv.destination_entity == const.DEST_GETTINGIN: # After recharging AGVs need to go back to the queue
+ 			#TODO: handle two cases: 1) the gettingIn of AGVs directly after the unloading unit (they don't need control, should be handled by Netlogo) 
+										# 2) the AGVs going to the queue after recharging (they need control, implemented in the following 4-5 lines)
+ 			target_pos = (34.0, 15.0)
+ 			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
+ 			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
+ 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
+ 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
+ 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
-#			target_pos = (34.0,50.0)
-# 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
-# 			potential_speed = convert_force_to_speed(potential_force, mass=5, time_interval=1)
-# 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			agv.platoon_type = const.PLATOON_UNLOADING # add agv to platoon 
 			### END: Handle AGVs who have different destinations (charging stations, unloading unit)
 		### BEGIN: Platoon control for AGVs who share destination
@@ -126,7 +138,7 @@ for tick in range(1,2000):
 			   platoon_unloading[index].platoon_position = position + 1
 		platoon_unloading.sort(key=lambda agv: agv.platoon_position) # Sort platoon based on platoon_position
 	   # Compute ideal speed for each element of the platoon
-		unloading_processing = 50 # Unloading processing time, to be put at the beginning of the main
+		unloading_processing = 500 # Unloading processing time, to be put at the beginning of the main
 		static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
 		moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != platoon_unloading[0].vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
 		potential_force = potential_field_controller(target_pos, [platoon_unloading[0].x, platoon_unloading[0].y], static_obstacles, moving_obstacles)
@@ -149,7 +161,6 @@ for tick in range(1,2000):
 	    agv_id1, agv_id2 = agv_ids
 	    if distance < safety_distance and agv_id1 != agv_id2:
 	        conflicts.append(agv_ids)
-	
 	# Solve conflicts
 	# TODO: solve conflicts in a smart way, avoiding collision in all possible scenarios
 	for conflict in conflicts:

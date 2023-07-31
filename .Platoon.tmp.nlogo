@@ -564,6 +564,32 @@ to Ñ-CheckIfNeedToCharge
 
 end
 
+to O-ImposedNeedToChargeImposed [#1]
+
+  ask vehicles #
+
+
+  with [VehicleDestinationEntity = 6 and ycor < 25] [
+
+    if (VehicleBatteryCharge <= 0.2 * VehicleBattery and (count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ;
+      set VehicleState 5
+      set vehicleDestinationEntity 3
+      set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = "-"]
+      face VehicleDestinationNode
+      set heading precision heading 3
+      let tempVehicleAssignStation who
+      ask VehicleDestinationNode [
+        set Rech.ReservedForVehicle tempVehicleAssignStation
+      ]
+      set VehicleSpeed-X 0.8
+      set VehicleSpeed-Y 0
+      set VehicleSpeed-Total 0.8
+    ]
+  ]
+
+
+end
+
 
 to O-MovingToChargers
 
@@ -667,7 +693,7 @@ to V-MovementVehicleOutside
   ask vehicles with [xcor >= 9.5 and xcor <= 10.5 and ycor = 15] [move-to turtle 21 set heading 0]      ; turn
 
 
-  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor = 105] [move-to turtle 19 set VehicleState 2 face turtle 0 set VehicleSpeed-X 0 set VehicleSpeed-Y  set VehicleSpeed-Total 0]      ; Entering
+  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor = 105] [move-to turtle 19 set VehicleState 2 face turtle 0 set VehicleSpeed-X 0 set VehicleSpeed-Y -0.8 set VehicleSpeed-Total 0.8]      ; Entering
   ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor >= 14.5 and ycor <= 15.5] [move-to turtle 22 set heading 270 set VehicleState 7 set VehicleDestinationEntity 4 set VehicleDestinationNode 0]      ; Exiting
 
 

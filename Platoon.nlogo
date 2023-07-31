@@ -4,6 +4,7 @@
 ; 1 Second SimulatedTime = 20 ticks
 
 
+
 globals [
 
  ;default   For movement. Global Variable created in the interface in order to set the simulation On: Netlogo Control Off: It will be controlled by another program
@@ -41,7 +42,7 @@ Vehicles-Own [
   VehicleWithProduct          ; Indicates the product being carried/ "0" Otherwise
   VehicleBattery              ; Type 1 = 21, Type 2 = 42, Type 3 = 63
   VehicleDestinationNode      ; Indicates the node of destination
-  VehicleDestinationEntity    ; Indicates the entity of destination. Could be: Machine = 1, ExitingVehicle = 2, ChargingStation = 3, LoadingStation = 4
+  VehicleDestinationEntity    ; Indicates the entity of destination. Could be: Machine = 1, ExitingVehicle = 2, ChargingStation = 3, LoadingStation = 4, UnloadingStation = 5, GettingIn = 6
   VehicleSpeed-X              ; Indicates the speed in the x-axis
   VehicleSpeed-Y              ; Indicates the speed in the y-axis
   VehicleSpeed-Total          ; Indicates the speed in the heading direction
@@ -67,7 +68,6 @@ Recharge-Stations-Own [
   Rech.NextCompletion         ; Important attribute that controls the completion time of an operation. Normally, it has the time of completion of next operation, or a big number (M)
   Rech.WithVehicle            ; Indicates which vechike is being process. "-" when is not processing product
   Rech.ReservedForVehicle     ; Indicates which Vehicle will arrive here
-
 ]
 
 to A-Setup
@@ -88,47 +88,23 @@ to A-Setup
 
 end
 
-to up
-  ask vehicle 23 [
-    set VehicleSpeed-X 0
-    set VehicleSpeed-Y 0.8
-  ]
-end
-
-to down
-  ask vehicle 23 [
-    set VehicleSpeed-X 0
-    set VehicleSpeed-Y -0.8
-  ]
-end
-
-to left-arrow
-  ask vehicle 23 [
-    set VehicleSpeed-X -0.8
-    set VehicleSpeed-Y 0
-  ]
-end
-
-to right-arrow
-  ask vehicle 23 [
-    set VehicleSpeed-X 0.8
-    set VehicleSpeed-Y 0
-  ]
-end
-
-
 to B-Go
 
   C-ReleasingProducts
   D-MovingVehicles
+  Ñ-CheckIfNeedToCharge
   O-MovingToChargers
   P-EnteringChargers
   R-ExitingChargers
   E-MachineEntry
   F-MachineExit
+  G-UnLoadStationEntry
+  H-UnLoadStationExit
   V-MovementVehicleOutside
-  I-CompletingProduct
+  ;I-CompletingProduct
   N-UpdateBateryDecharging
+
+
 
   tick
   set SimulationTime precision (SimulationTime + 0.05) 3
@@ -197,13 +173,13 @@ to D-MovingVehicles
 
 
         set heading precision heading 3
-        if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]                                    ; Change according to speed
+        if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]                                    ;
         set xcor  precision xcor 3
         set ycor  precision ycor 3
         ask product VehicleWithProduct [move-to turtle ProductInVehicle]
       ]
       if (VehicleWithProduct = 0)[
-        if (count vehicles in-cone 25 70 < 2) [forward 0.8]                                   ; Change according to speed
+        if (count vehicles in-cone 10 70 < 2) [forward 0.8]
         set xcor  precision xcor 3
         set ycor  precision ycor 3
       ]
@@ -218,13 +194,13 @@ to D-MovingVehicles
         set VehicleSpeed-Y VehicleSpeed-Total * sin W-HeadingToAngle heading
         set VehicleSpeed-X precision VehicleSpeed-X 3
         set VehicleSpeed-Y precision VehicleSpeed-Y 3
-        if (count vehicles in-cone 10 70 < 2) [forward 0.8]                                     ; Change according to speed
+        if (count vehicles in-cone 10 70 < 2) [forward 0.8]
         set xcor  precision xcor 3
         set ycor  precision ycor 3
         ask product VehicleWithProduct [move-to turtle ProductInVehicle]
       ]
       if (VehicleWithProduct = 0)[
-        if (count vehicles in-cone 25 70 < 2) [forward 0.8]                                     ; Change according to speed, change in-cone xx for changing teh spacing
+        if (count vehicles in-cone 10 70 < 2) [forward 0.8]
         set xcor  precision xcor 3
         set ycor  precision ycor 3
       ]
@@ -248,7 +224,7 @@ end
 
 to E-MachineEntry
 
-  ask machines [
+  ask machines with [who != 11] [
     let temporalMachineVar who
 
     if(count vehicles in-radius 2 with [VehicleState = 3 and VehicleDestinationNode = temporalMachineVar] = 1)[
@@ -283,8 +259,9 @@ end
 
 to F-MachineExit
 
-  ask machines [
+  ask machines with [who != 11] [
     let MachineTemp who
+
     if (MachineNextCompletion <= SimulationTime) [
       let TemporalDestNodeVar ""
       ask product MachineProcessingProduct[
@@ -303,7 +280,7 @@ to F-MachineExit
       ask vehicle MachineWithVehicle[
         set VehicleState 3
         set VehicleDestinationNode item 0 TemporalDestNodeVar
-        ifelse (VehicleDestinationNode = 11) [set VehicleDestinationEntity 5][set VehicleDestinationEntity 1] ;added 17/07
+        ifelse (VehicleDestinationNode = 11) [set VehicleDestinationEntity 5][set VehicleDestinationEntity 1] ; added 17/07
         ifelse (MachineTemp <= 5)[
           set VehicleSpeed-X 0
           set VehicleSpeed-Y -0.8
@@ -323,11 +300,81 @@ to F-MachineExit
 
 end
 
-to G-RechargingStationEntry
+to G-UnLoadStationEntry
+
+  ask machine 11 [
+    let temporalMachineVar who
+
+    if(count vehicles in-radius 2 with [VehicleState = 3 and VehicleDestinationNode = temporalMachineVar] = 1)[
+
+      let temporalVehicleVar ""
+      let TemporalOperationVar ""
+      ask vehicles in-radius 2 [
+        set temporalVehicleVar who
+        move-to machine temporalMachineVar
+        ask product VehicleWithProduct [move-to machine temporalMachineVar]
+      ]
+      set MachineState 1
+      let temporalX xcor
+      let temporalY ycor
+      set MachineWithVehicle item 0 [who] of vehicles with [xcor = temporalX and ycor = temporalY]
+      set MachineProcessingProduct [VehicleWithProduct] of vehicle MachineWithVehicle
+      ask vehicle MachineWithVehicle [
+        set VehicleState 4
+      ]
+      ask product MachineProcessingProduct[
+        set ProductState 3
+        set ProductStartOperation lput SimulationTime ProductStartOperation
+        set ProductInMachine TemporalMachineVar
+        set TemporalOperationVar item ProductNextOperation ProductOperations
+      ]
+      set MachineNextCompletion SimulationTime + item (position TemporalOperationVar MachinePossibleOperations) MachineOperProcessingTime
+    ]
+  ]
 
 end
 
-to H-RechargingStationExit
+to H-UnLoadStationExit
+
+  ask machine 11 [
+    let MachineTemp who
+    if (MachineNextCompletion <= SimulationTime) [
+      let TemporalDestNodeVar ""
+      ask product MachineProcessingProduct[
+        set ProductState 4
+        set heading 270
+        set ProductCurrentOperation (length ProductCompletionOperation)
+        set ProductCompletionOperation lput SimulationTime ProductCompletionOperation
+        set ProductInMachine 0
+
+
+      ]
+      ask vehicle MachineWithVehicle[
+        set VehicleState 3
+        set heading 180
+        if (VehicleType = 1) [set shape "t1"]
+        if (VehicleType = 2) [set shape "t2"]
+        if (VehicleType = 3) [set shape "t3"]
+        set VehicleWithProduct 0
+        set VehicleDestinationNode 22
+        set VehicleDestinationEntity 6
+        set VehicleSpeed-X -0.8
+        set VehicleSpeed-Y 0
+        set VehicleSpeed-Total 0.8
+      ]
+      set MachineState 0
+      set MachineNextCompletion  10000000
+      set MachineProcessingProduct 0
+      set MachineWithVehicle 0
+    ]
+  ]
+
+  ask products with [xcor >= 22.5 and xcor <= 23.5 and ycor >= 49.7 and ycor <= 50.3][
+    if(ProductState != 5)[
+      move-to turtle 18
+      set ProductState 5
+    ]
+  ]
 
 end
 
@@ -353,27 +400,11 @@ to I-CompletingProduct
       set VehicleDestinationNode 22
       set vehicleDestinationEntity 2
       let tempVehicleAssignStation who
-      if (VehicleBatteryCharge <= 10 and (count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5) [
-        set VehicleState  5
-        set vehicleDestinationEntity 3
-        set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle =  "None"]
-        face VehicleDestinationNode
-        ask VehicleDestinationNode [
-           set Rech.ReservedForVehicle tempVehicleAssignStation
-        ]
-        set VehicleSpeed-X 0.8
-        set VehicleSpeed-Y 0
-        set VehicleSpeed-Total 0.8
-      ]
+
     ]
   ]
 
-  ask products with [xcor >= 22.7 and xcor <= 23.3 and ycor >= 49.7 and ycor <= 50.3][
-    if(ProductState != 5)[
-      set ProductCompletionOperation lput SimulationTime ProductCompletionOperation
-      set ProductState 5
-    ]
-  ]
+
 end
 
 to J-CreatingProductionOrder
@@ -507,19 +538,57 @@ to N-UpdateBateryDecharging
 
 end
 
+to Ñ-CheckIfNeedToCharge
+
+  ask vehicles with [VehicleDestinationEntity = 6] [
+    if (VehicleBatteryCharge <= 10 and (count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ; change 10 for the minimum charging
+      set VehicleState 5
+      set vehicleDestinationEntity 3
+      set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = "-"]
+      face VehicleDestinationNode
+      set heading precision heading 3
+      let tempVehicleAssignStation who
+      ask VehicleDestinationNode [
+        set Rech.ReservedForVehicle tempVehicleAssignStation
+      ]
+      set VehicleSpeed-X 0.8
+      set VehicleSpeed-Y 0
+      set VehicleSpeed-Total 0.8
+    ]
+  ]
+
+end
+
+
 to O-MovingToChargers
 
-  ask vehicles with [VehicleState = 5][
-    set heading precision heading 3
-    if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]                                     ; Change according to speed
-    set xcor  precision xcor 3
-    set ycor  precision ycor 3
-    set VehicleSpeed-Total 0.8
-    set VehicleSpeed-X VehicleSpeed-Total * cos W-HeadingToAngle heading
-    set VehicleSpeed-Y VehicleSpeed-Total * sin W-HeadingToAngle heading
-    set VehicleSpeed-X precision VehicleSpeed-X 3
-    set VehicleSpeed-Y precision VehicleSpeed-Y 3
-    set VehicleSpeed-Total 0.8
+  ifelse (Default = False) [
+    ask vehicles with [VehicleState = 5][
+      set VehicleSpeed-Total sqrt (VehicleSpeed-X ^ 2 + VehicleSpeed-Y ^ 2)
+
+      if(VehicleSpeed-X >= 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+      if(VehicleSpeed-X < 0 and VehicleSpeed-Y >= 0 ) [set heading 450 - (acos (VehicleSpeed-X / VehicleSpeed-Total))]
+      if(VehicleSpeed-X < 0 and VehicleSpeed-Y < 0 ) [set heading 0 - 90 + (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+      if(VehicleSpeed-X >= 0 and VehicleSpeed-Y < 0 ) [set heading 450 - (asin (VehicleSpeed-Y / VehicleSpeed-Total))]
+
+      set heading precision heading 3
+      if (count vehicles in-cone 10 40 < 2) [forward VehicleSpeed-Total]
+      set xcor  precision xcor 3
+      set ycor  precision ycor 3
+    ]
+  ][
+   ask vehicles with [VehicleState = 5][
+      face VehicleDestinationNode
+      set heading precision heading 3
+      set VehicleSpeed-Total 0.8
+      set VehicleSpeed-X VehicleSpeed-Total * cos W-HeadingToAngle heading
+      set VehicleSpeed-Y VehicleSpeed-Total * sin W-HeadingToAngle heading
+      set VehicleSpeed-X precision VehicleSpeed-X 3
+      set VehicleSpeed-Y precision VehicleSpeed-Y 3
+      if (count vehicles in-cone 10 70 < 2) [forward 0.8]
+      set xcor  precision xcor 3
+      set ycor  precision ycor 3
+   ]
   ]
 
 end
@@ -542,6 +611,7 @@ to P-EnteringChargers
       set Rech.WithVehicle TempVehicleEntering
       set Rech.State 1
       set Rech.NextCompletion SimulationTime + (121 * exp(2.7 * dischargelevel) * (Full / 21))
+      set Rech.NextCompletion precision Rech.NextCompletion 2
     ]
   ]
 
@@ -562,7 +632,8 @@ to R-ExitingChargers
       ]
       set Rech.State 0
       set Rech.NextCompletion 1000000000
-
+      set Rech.WithVehicle "-"
+      set Rech.ReservedForVehicle "-"
 
 
     ]
@@ -592,13 +663,15 @@ to V-MovementVehicleOutside
 
 
   ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor = 105] [move-to turtle 19 set VehicleState 2 face turtle 0 set VehicleSpeed-X 0 set VehicleSpeed-Y 0 set VehicleSpeed-Total 0]      ; Entering
-  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor >= 14.5 and ycor <= 15.5] [move-to turtle 22 set heading 270 set VehicleState 7]      ; Exiting
+  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor >= 14.5 and ycor <= 15.5] [move-to turtle 22 set heading 270 set VehicleState 7 set VehicleDestinationEntity 4 set VehicleDestinationNode 0]      ; Exiting
 
 
   let TempVehiclesInTransit count vehicles with [xcor >= 32 and xcor <= 36 and ycor >= 70.5 and ycor <= 102]
   let TempProductsToBeReleased count products with [ProductState = 0]
 
-  ask vehicles with [xcor = 34 and ycor = 105] [if (TempProductsToBeReleased > TempVehiclesInTransit)[set VehicleState 3]]
+
+
+  ask vehicles with [xcor = 34 and ycor = 105] [ifelse (TempProductsToBeReleased > TempVehiclesInTransit)[set VehicleState 3][set VehicleState 2]]
 
   ask vehicles with [xcor = 34 and ycor >= 69.5 and ycor <= 70.5] [move-to turtle 0 set VehicleState 1]
 
@@ -623,7 +696,7 @@ to X-SetupMachines
   ask machine 8 [set MachineID 8 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 8)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
   ask machine 9 [set MachineID 9 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 9)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
   ask machine 10 [set MachineID 10 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 10)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-
+  ask machine 11 [set MachineID 11 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 11)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
 
 end
 
@@ -703,14 +776,14 @@ to Z-Layout
   create-machines 1 [setxy 194.5 14.5 set shape "circle" set size 1 set color black set heading 0]     ; Processing Node M9
   create-machines 1 [setxy 224.5 14.5 set shape "circle" set size 1 set color black set heading 0]     ; Processing Node M10
 
-  create-turtles 1 [setxy 34 50 set shape "circle" set size 1 set color black set heading 0]          ; Unloading Node
+  create-machines 1 [setxy 34 50 set shape "circle" set size 1 set color black set heading 0]          ; Unloading Node
 
 
-  create-Recharge-Stations 1 [setxy 256 80 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 1]         ; Recharging Node R1
-  create-Recharge-Stations 1 [setxy 256 70 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 2]         ; Recharging Node R2
-  create-Recharge-Stations 1 [setxy 256 60 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 3]         ; Recharging Node R3
-  create-Recharge-Stations 1 [setxy 256 50 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 4]         ; Recharging Node R4
-  create-Recharge-Stations 1 [setxy 256 40 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle 0 set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 5]         ; Recharging Node R5
+  create-Recharge-Stations 1 [setxy 256 80 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 1]         ; Recharging Node R1
+  create-Recharge-Stations 1 [setxy 256 70 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 2]         ; Recharging Node R2
+  create-Recharge-Stations 1 [setxy 256 60 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 3]         ; Recharging Node R3
+  create-Recharge-Stations 1 [setxy 256 50 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 4]         ; Recharging Node R4
+  create-Recharge-Stations 1 [setxy 256 40 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 5]         ; Recharging Node R5
 
   create-turtles 1 [setxy 23 70 set shape "Circle" set size 8 set color green + 2 set heading 0]
   create-turtles 1 [setxy 23 50 set shape "Circle" set size 8 set color red + 2 set heading 0]
@@ -723,11 +796,11 @@ end
 GRAPHICS-WINDOW
 127
 10
-1259
-503
+978
+382
 -1
 -1
-4.0
+3.0
 1
 10
 1
@@ -805,7 +878,7 @@ SWITCH
 311
 Default
 Default
-1
+0
 1
 -1000
 
@@ -838,63 +911,12 @@ SimulationTime
 11
 
 BUTTON
-19
-380
-82
-413
-Up
-up
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1
-418
-56
-451
-Left
-Left-Arrow
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-60
-418
-115
-451
-Right
-right-arrow
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-19
-456
+13
+165
 85
-489
-Down
-down
+198
+3000x
+repeat 3000 [B-go]
 NIL
 1
 T

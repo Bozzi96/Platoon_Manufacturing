@@ -407,7 +407,7 @@ to I-CompletingProduct
 
 end
 
-to J-CreatingProductionOrder
+to J-CreatingProductionOrder       ; ID, ProductType, Release order, DueDate
 
   if (Default = True)[
     K-CreatingProduct 201 1 0 2000
@@ -428,7 +428,7 @@ to J-CreatingProductionOrder
   ]
 
   if (Default = False)[
-        K-CreatingProduct 201 1 1 2000
+    K-CreatingProduct 201 1 1 2000
     K-CreatingProduct 202 8 2 2000
     K-CreatingProduct 203 1 3 2000
     K-CreatingProduct 204 8 4 2000
@@ -467,6 +467,11 @@ to K-CreatingProduct [#1 #2 #3 #4] ; #1: Id of product, #2: Type of product, #3:
     if (productType = 8) [set ProductWeight 30 set ProductOperations (list 0 3 5 9 11)]
     if (productType = 9) [set ProductWeight 30 set ProductOperations (list 0 3 4 6 10 11)]
     if (productType = 10) [set ProductWeight 30 set ProductOperations (list 0 3 5 7 10 11)]
+
+
+
+
+
     set ProductState 0
     set ProductReleaseOrder #3
     set ProductDueDate #4
@@ -531,7 +536,7 @@ to N-UpdateBateryDecharging
     let loaded ""
     ifelse(VehicleWithProduct = 0) [set loaded 0][set loaded 1]
 
-    set VehicleBatteryCharge VehicleBatteryCharge - ((0.00434 * VehicleSpeed-Total) / 20) - ((0.00434 * 0.5 * Loaded) / 20)   ; Check if it is ok the tick as it is divided by 20
+    set VehicleBatteryCharge VehicleBatteryCharge - 20 * ((0.00434 * VehicleSpeed-Total) / 20) - ((0.00434 * 0.5 * Loaded) / 20)   ; Check if it is ok the tick as it is divided by 20
     set VehicleBatteryCharge precision VehicleBatteryCharge 6
 
   ]
@@ -540,8 +545,8 @@ end
 
 to Ñ-CheckIfNeedToCharge
 
-  ask vehicles with [VehicleDestinationEntity = 6] [
-    if (VehicleBatteryCharge <= 10 and (count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ; change 10 for the minimum charging
+  ask vehicles with [VehicleDestinationEntity = 6 and ycor < 25] [
+    if (VehicleBatteryCharge <= 0.2 * VehicleBattery and (count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ;
       set VehicleState 5
       set vehicleDestinationEntity 3
       set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = "-"]
@@ -556,6 +561,28 @@ to Ñ-CheckIfNeedToCharge
       set VehicleSpeed-Total 0.8
     ]
   ]
+
+end
+
+to O-ImposedNeedToChargeImposed [#1]
+
+  ask vehicles with [VehicleId = #1] [
+    if ((count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ;
+      set VehicleState 5
+      set vehicleDestinationEntity 3
+      set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = "-"]
+      face VehicleDestinationNode
+      set heading precision heading 3
+      let tempVehicleAssignStation who
+      ask VehicleDestinationNode [
+        set Rech.ReservedForVehicle tempVehicleAssignStation
+      ]
+      set VehicleSpeed-X 0.8
+      set VehicleSpeed-Y 0
+      set VehicleSpeed-Total 0.8
+    ]
+  ]
+
 
 end
 
@@ -610,7 +637,7 @@ to P-EnteringChargers
       ]
       set Rech.WithVehicle TempVehicleEntering
       set Rech.State 1
-      set Rech.NextCompletion SimulationTime + (121 * exp(2.7 * dischargelevel) * (Full / 21))
+      set Rech.NextCompletion SimulationTime + (121 * exp(2.7 * dischargelevel) * (Full / 21) / 30)
       set Rech.NextCompletion precision Rech.NextCompletion 2
     ]
   ]
@@ -662,7 +689,7 @@ to V-MovementVehicleOutside
   ask vehicles with [xcor >= 9.5 and xcor <= 10.5 and ycor = 15] [move-to turtle 21 set heading 0]      ; turn
 
 
-  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor = 105] [move-to turtle 19 set VehicleState 2 face turtle 0 set VehicleSpeed-X 0 set VehicleSpeed-Y 0 set VehicleSpeed-Total 0]      ; Entering
+  ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor = 105] [move-to turtle 19 set VehicleState 2 face turtle 0 set VehicleSpeed-X 0 set VehicleSpeed-Y -0.8 set VehicleSpeed-Total 0.8]      ; Entering
   ask vehicles with [xcor >= 33.5 and xcor <= 34.5 and ycor >= 14.5 and ycor <= 15.5] [move-to turtle 22 set heading 270 set VehicleState 7 set VehicleDestinationEntity 4 set VehicleDestinationNode 0]      ; Exiting
 
 

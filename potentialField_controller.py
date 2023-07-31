@@ -281,7 +281,7 @@ def calculate_repulsive_force_moving_obstacles(current_position, obstacles, movi
 
 MAX_SPEED_PAYLOAD = 0.5
 MAX_SPEED_NO_PAYLOAD = 0.8
-def convert_force_to_speed(force, mass, time_interval):
+def convert_force_to_speed(force, mass, time_interval, payload):
     """
     Converts the force to speed on the x and y axes.
 
@@ -298,14 +298,14 @@ def convert_force_to_speed(force, mass, time_interval):
 
     speed_x = acceleration_x * time_interval
     speed_y = acceleration_y * time_interval
-    # total_speed = math.sqrt(speed_x**2 + speed_y**2)
-    # if total_speed > MAX_SPEED_PAYLOAD and payload > 0: #Speed exceeds the maximum speed for AGV with payload
-    #    scaling_factor = MAX_SPEED_PAYLOAD/total_speed
-    #    speed_x = speed_x * scaling_factor
-    #    speed_y = speed_y * scaling_factor
-    # if total_speed > MAX_SPEED_NO_PAYLOAD and payload == 0: #Speed exceeds the maximum speed for AGV without payload
-    #    scaling_factor = MAX_SPEED_NO_PAYLOAD/total_speed
-    #    speed_x = speed_x * scaling_factor
-    #    speed_y = speed_y * scaling_factor
+    total_speed = math.sqrt(speed_x**2 + speed_y**2)
+    if total_speed > MAX_SPEED_PAYLOAD and payload > 0: #Speed exceeds the maximum speed for AGV with payload
+        scaling_factor = MAX_SPEED_PAYLOAD/total_speed
+        speed_x = speed_x * scaling_factor
+        speed_y = speed_y * scaling_factor
+    if total_speed > MAX_SPEED_NO_PAYLOAD and payload == 0: #Speed exceeds the maximum speed for AGV without payload
+        scaling_factor = MAX_SPEED_NO_PAYLOAD/total_speed
+        speed_x = speed_x * scaling_factor
+        speed_y = speed_y * scaling_factor
 
     return speed_x, speed_y

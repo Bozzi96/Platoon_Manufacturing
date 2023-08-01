@@ -102,9 +102,11 @@ for tick in range(1,2000):
 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			### END: Potential field control
 			### BEGIN: Recharging decision after passing through the unloading unit
-		if agv.destination_entity == const.DEST_EXITINGVEHICLE:
+		if agv.destination_entity == const.DEST_GETTINGIN:
 			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
+			recharging = True #TODO: fix recharging (currently not working)
 			if recharging:
+# 				ncm.netlogo.command("O-ImposedNeedToChargeImposed " + str(agv.vehicle_id))
 				agv.destination_entity = const.DEST_CHARGINGSTATION
 				recharge_dest = find_free_recharging_station(Stations)
 				agv.destination_node = recharge_dest

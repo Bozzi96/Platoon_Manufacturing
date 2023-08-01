@@ -34,9 +34,9 @@ def potential_field_controller(target_position, current_position, obstacles, mov
     Returns:
         tuple: A tuple containing the total force (force_x, force_y) and the angle (in radians).
     """
-    attractive_force = calculate_attractive_force(target_position, current_position, gain=200)
+    attractive_force = calculate_attractive_force(target_position, current_position, gain=2)
     repulsive_force = calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, \
-																 safe_distance=20, static_gain=1, dynamic_gain=15)
+																 safe_distance=50, static_gain=500, dynamic_gain=150)
     total_force = ((attractive_force[0] + repulsive_force[0]), (attractive_force[1] + repulsive_force[1]))
     angle = math.atan2(total_force[1], total_force[0])
 

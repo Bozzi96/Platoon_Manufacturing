@@ -46,7 +46,7 @@ Vehicles-Own [
   VehicleSpeed-Y              ; Indicates the speed in the y-axis
   VehicleSpeed-Total          ; Indicates the speed in the heading direction
   VehicleBatteryCharge        ; Indicates the charge of battery
-
+  VehicleAcumEnergy           ; Indicates the energy consumption from the beginning
 ]
 
 Machines-Own [
@@ -512,6 +512,7 @@ to L-CreatingVehiclesFleet [#1]     ; #1 List of Type of Vehicles (1, 2, 3). Ord
       set VehicleSpeed-Y 0
       set VehicleSpeed-Total 0.8
       set VehicleWithProduct 0
+      set VehicleAcumEnergy 0
     ]
     set i i + 1
   ]
@@ -535,9 +536,11 @@ to N-UpdateBateryDecharging
     let loaded ""
     ifelse(VehicleWithProduct = 0) [set loaded 0][set loaded 1]
 
-    set VehicleBatteryCharge VehicleBatteryCharge - 20 * ((0.00434 * VehicleSpeed-Total) / 20) - ((0.00434 * 0.5 * Loaded) / 20)   ; Check if it is ok the tick as it is divided by 20
+    let temporal 20 * ((0.00434 * VehicleSpeed-Total) / 20) - ((0.00434 * 0.5 * Loaded) / 20)      ; Check if it is ok the tick as it is divided by 20
+    set VehicleBatteryCharge VehicleBatteryCharge - temporal
     set VehicleBatteryCharge precision VehicleBatteryCharge 6
-
+    set VehicleAcumEnergy VehicleAcumEnergy + temporal
+    set VehicleAcumEnergy precision VehicleAcumEnergy 3
   ]
 
 end

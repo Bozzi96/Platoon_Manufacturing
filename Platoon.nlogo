@@ -563,7 +563,7 @@ to Ñ-CheckIfNeedToCharge
 
 end
 
-to O-ImposedNeedToChargeImposed [#1]
+to O-ImposedNeedToCharge [#1]
 
   ask vehicles with [VehicleId = #1] [
     if ((count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ;

@@ -181,6 +181,14 @@ def count_free_station():
 def count_AGV_waiting():
 	return netlogo.report("count Vehicles with [VehicleState = " + str(const.WAITING_OUTSIDE) + "]")
 
+def count_product_completed():
+	return netlogo.report("count Products with [ProductState = " + str(const.FINISHED ) + "]")
+
 def command_destination(vehicle_id, destination, node):
 	netlogo.command("ask vehicles with [vehicleid = " + str(vehicle_id) + "] [ set VehicleDestinationEntity " + str(destination) + " set VehicleDestinationNode " + str(node) + "]")
 	
+def get_unloading_completion():
+	return netlogo.report("[machinenextcompletion] of machine 11" )
+
+def get_unloading_availability():
+	return netlogo.report("[machinestate] of machine 11" )

@@ -34,9 +34,9 @@ def potential_field_controller(target_position, current_position, obstacles, mov
     Returns:
         tuple: A tuple containing the total force (force_x, force_y) and the angle (in radians).
     """
-    attractive_force = calculate_attractive_force(target_position, current_position, gain=200)
+    attractive_force = calculate_attractive_force(target_position, current_position, gain=2)
     repulsive_force = calculate_repulsive_force_moving_obstacles(current_position, obstacles, moving_obstacles, \
-																 safe_distance=20, static_gain=1, dynamic_gain=15)
+																 safe_distance=50, static_gain=500, dynamic_gain=150)
     total_force = ((attractive_force[0] + repulsive_force[0]), (attractive_force[1] + repulsive_force[1]))
     angle = math.atan2(total_force[1], total_force[0])
 
@@ -281,7 +281,7 @@ def calculate_repulsive_force_moving_obstacles(current_position, obstacles, movi
 
 MAX_SPEED_PAYLOAD = 0.5
 MAX_SPEED_NO_PAYLOAD = 0.8
-def convert_force_to_speed(force, mass, time_interval):
+def convert_force_to_speed(force, mass, time_interval, payload):
     """
     Converts the force to speed on the x and y axes.
 
@@ -298,14 +298,14 @@ def convert_force_to_speed(force, mass, time_interval):
 
     speed_x = acceleration_x * time_interval
     speed_y = acceleration_y * time_interval
-    # total_speed = math.sqrt(speed_x**2 + speed_y**2)
-    # if total_speed > MAX_SPEED_PAYLOAD and payload > 0: #Speed exceeds the maximum speed for AGV with payload
-    #    scaling_factor = MAX_SPEED_PAYLOAD/total_speed
-    #    speed_x = speed_x * scaling_factor
-    #    speed_y = speed_y * scaling_factor
-    # if total_speed > MAX_SPEED_NO_PAYLOAD and payload == 0: #Speed exceeds the maximum speed for AGV without payload
-    #    scaling_factor = MAX_SPEED_NO_PAYLOAD/total_speed
-    #    speed_x = speed_x * scaling_factor
-    #    speed_y = speed_y * scaling_factor
+    total_speed = math.sqrt(speed_x**2 + speed_y**2)
+    if total_speed > MAX_SPEED_PAYLOAD and payload > 0: #Speed exceeds the maximum speed for AGV with payload
+        scaling_factor = MAX_SPEED_PAYLOAD/total_speed
+        speed_x = speed_x * scaling_factor
+        speed_y = speed_y * scaling_factor
+    if total_speed > MAX_SPEED_NO_PAYLOAD and payload == 0: #Speed exceeds the maximum speed for AGV without payload
+        scaling_factor = MAX_SPEED_NO_PAYLOAD/total_speed
+        speed_x = speed_x * scaling_factor
+        speed_y = speed_y * scaling_factor
 
     return speed_x, speed_y

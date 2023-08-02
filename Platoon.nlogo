@@ -10,7 +10,6 @@ globals [
  ;default   For movement. Global Variable created in the interface in order to set the simulation On: Netlogo Control Off: It will be controlled by another program
 
  SimulationTime
-
 ]
 
 breed [Products Product]

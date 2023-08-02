@@ -19,7 +19,7 @@ import math
 from AGV import AGV, update_AGVs, compute_agvs_distances, recharge_decision
 from Product import Product
 from Machine import Machine
-from Station import Station
+from Station import Station, update_Stations
 from potentialField_controller import potential_field_controller,convert_force_to_speed
 from computations import get_target_position, solve_conflicts, find_free_recharging_station
 
@@ -102,11 +102,15 @@ for tick in range(1,2000):
 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			### END: Potential field control
 			### BEGIN: Recharging decision after passing through the unloading unit
-		if agv.destination_entity == const.DEST_GETTINGIN:
+		if agv.destination_entity == const.DEST_GETTINGIN and agv.y < 25:
 			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			recharging = True #TODO: fix recharging (currently not working)
 			if recharging:
-# 				ncm.netlogo.command("O-ImposedNeedToChargeImposed " + str(agv.vehicle_id))
+				### TODO: fix reserved_vehicle information, we need an INTEGER (currently it is a string)
+				### At the moment, without this, all vehicles go to the same recharging unit
+# 				rech_info = ncm.log_rech_info()
+# 				update_Stations(Stations, rech_info)
+				ncm.netlogo.command("O-ImposedNeedToCharge " + str(agv.vehicle_id))
 				agv.destination_entity = const.DEST_CHARGINGSTATION
 				recharge_dest = find_free_recharging_station(Stations)
 				agv.destination_node = recharge_dest

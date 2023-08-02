@@ -39,7 +39,11 @@ def potential_field_controller(target_position, current_position, obstacles, mov
 																 safe_distance=50, static_gain=500, dynamic_gain=150)
     total_force = ((attractive_force[0] + repulsive_force[0]), (attractive_force[1] + repulsive_force[1]))
     angle = math.atan2(total_force[1], total_force[0])
-
+	# Check if the result is NaN
+    if math.isnan(total_force[0]) or math.isnan(total_force[1]):
+        # Replace NaN with a default value (e.g., 10)
+        total_force[0]= 10
+        total_force[1] = 10
     return total_force[0], total_force[1]
 
 

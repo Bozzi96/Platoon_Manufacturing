@@ -56,4 +56,17 @@ class Station:
 
 	def set_reserved_vehicle(self, reserved_vehicle):
 		self.reserved_vehicle= reserved_vehicle
-		
+
+
+def update_Stations(Stations, rech_info):
+	for info in rech_info:
+		station_id= info[0]
+		# Find the AGV object with the corresponding index
+		station = next((station for station in Stations if station.station_id == station_id), None)
+    
+		# Update the information about the AGV
+		if station is not None:
+			station.state = info[1]
+			station.completion = info[2]
+			station.curr_vehicle = info[3]
+			station.reserved_vehicle = info[4]

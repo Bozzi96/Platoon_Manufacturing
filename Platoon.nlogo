@@ -551,7 +551,7 @@ to Ñ-CheckIfNeedToCharge
     if (VehicleBatteryCharge <= 0.2 * VehicleBattery and (count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ;
       set VehicleState 5
       set vehicleDestinationEntity 3
-      set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = "-"]
+      set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = "0"]
       face VehicleDestinationNode
       set heading precision heading 3
       let tempVehicleAssignStation who
@@ -572,7 +572,7 @@ to O-ImposedNeedToCharge [#1]
     if ((count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ;
       set VehicleState 5
       set vehicleDestinationEntity 3
-      set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = "-"]
+      set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = "0"]
       face VehicleDestinationNode
       set heading precision heading 3
       let tempVehicleAssignStation who
@@ -658,11 +658,12 @@ to R-ExitingChargers
         set VehicleState 3
         face turtle 22
         set VehicleBatteryCharge VehicleBattery
+        set VehicleDestinationEntity 6
       ]
       set Rech.State 0
       set Rech.NextCompletion 1000000000
       set Rech.WithVehicle "-"
-      set Rech.ReservedForVehicle "-"
+      set Rech.ReservedForVehicle "0"
 
 
     ]
@@ -808,11 +809,11 @@ to Z-Layout
   create-machines 1 [setxy 34 50 set shape "circle" set size 1 set color black set heading 0]          ; Unloading Node
 
 
-  create-Recharge-Stations 1 [setxy 256 80 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 1]         ; Recharging Node R1
-  create-Recharge-Stations 1 [setxy 256 70 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 2]         ; Recharging Node R2
-  create-Recharge-Stations 1 [setxy 256 60 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 3]         ; Recharging Node R3
-  create-Recharge-Stations 1 [setxy 256 50 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 4]         ; Recharging Node R4
-  create-Recharge-Stations 1 [setxy 256 40 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "-" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 5]         ; Recharging Node R5
+  create-Recharge-Stations 1 [setxy 256 80 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "0" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 1]         ; Recharging Node R1
+  create-Recharge-Stations 1 [setxy 256 70 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "0" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 2]         ; Recharging Node R2
+  create-Recharge-Stations 1 [setxy 256 60 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "0" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 3]         ; Recharging Node R3
+  create-Recharge-Stations 1 [setxy 256 50 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "0" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 4]         ; Recharging Node R4
+  create-Recharge-Stations 1 [setxy 256 40 set shape "circle" set size 1 set color black set heading 0 set Rech.ReservedForVehicle "0" set Rech.State 0 set Rech.NextCompletion 1000000000 set Rech.StationID 5]         ; Recharging Node R5
 
   create-turtles 1 [setxy 23 70 set shape "Circle" set size 8 set color green + 2 set heading 0]
   create-turtles 1 [setxy 23 50 set shape "Circle" set size 8 set color red + 2 set heading 0]
@@ -907,7 +908,7 @@ SWITCH
 311
 Default
 Default
-0
+1
 1
 -1000
 

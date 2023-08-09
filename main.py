@@ -104,12 +104,9 @@ for tick in range(1,2000):
 			### BEGIN: Recharging decision after passing through the unloading unit
 		if agv.destination_entity == const.DEST_GETTINGIN and agv.y < 25:
 			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
-			recharging = True #TODO: fix recharging (currently not working)
 			if recharging:
-				### TODO: fix reserved_vehicle information, we need an INTEGER (currently it is a string)
-				### At the moment, without this, all vehicles go to the same recharging unit
-# 				rech_info = ncm.log_rech_info()
-# 				update_Stations(Stations, rech_info)
+				rech_info = ncm.log_rech_info()
+				update_Stations(Stations, rech_info)
 				ncm.netlogo.command("O-ImposedNeedToCharge " + str(agv.vehicle_id))
 				agv.destination_entity = const.DEST_CHARGINGSTATION
 				recharge_dest = find_free_recharging_station(Stations)
@@ -126,8 +123,6 @@ for tick in range(1,2000):
 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product)
 			agv.platoon_type = const.PLATOON_CHARGING # add agv to platoon 
 		if agv.destination_entity == const.DEST_GETTINGIN: # After recharging AGVs need to go back to the queue
- 			#TODO: handle two cases: 1) the gettingIn of AGVs directly after the unloading unit (they don't need control, should be handled by Netlogo) 
-										# 2) the AGVs going to the queue after recharging (they need control, implemented in the following 4-5 lines)
  			target_pos = (34.0, 15.0)
  			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
  			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
@@ -199,6 +194,5 @@ for tick in range(1,2000):
 	if ncm.count_product_completed() == P:
 		break
 ###############################################################################################
-print("Finee" + str(tick))
-#TODO: Find a way to end the simulation and store results (performance index)
+#TODO: Store results (performance index)
 	

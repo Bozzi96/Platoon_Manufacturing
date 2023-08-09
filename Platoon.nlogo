@@ -558,6 +558,7 @@ to Ñ-CheckIfNeedToCharge
       ask VehicleDestinationNode [
         set Rech.ReservedForVehicle tempVehicleAssignStation
       ]
+      set VehicleDestinationNode [who] of VehicleDestinationNode
       set VehicleSpeed-X 0.8
       set VehicleSpeed-Y 0
       set VehicleSpeed-Total 0.8
@@ -579,6 +580,7 @@ to O-ImposedNeedToCharge [#1]
       ask VehicleDestinationNode [
         set Rech.ReservedForVehicle tempVehicleAssignStation
       ]
+      set VehicleDestinationNode [who] of VehicleDestinationNode
       set VehicleSpeed-X 0.8
       set VehicleSpeed-Y 0
       set VehicleSpeed-Total 0.8
@@ -607,7 +609,7 @@ to O-MovingToChargers
     ]
   ][
    ask vehicles with [VehicleState = 5][
-      face VehicleDestinationNode
+      face turtle VehicleDestinationNode
       set heading precision heading 3
       set VehicleSpeed-Total 0.8
       set VehicleSpeed-X VehicleSpeed-Total * cos W-HeadingToAngle heading
@@ -908,7 +910,7 @@ SWITCH
 311
 Default
 Default
-1
+0
 1
 -1000
 

@@ -9,7 +9,7 @@ Overleaf(Latex) project: https://www.overleaf.com/2212164663mhrbpfvqpwtn
 ## User guide
 The main point of this work is the integration between Netlogo and Python to make a smart manufacturing system evolve over time, while retrieving data from Netlogo, sending them to Python in order to perform computations, provide control actions and finally send them back to Python.
 
-To launch the simulation, you must install:
+To launch the simulation, it is required:
 - Python (version 3.9.7 is being currently used)
 - Netlogo (version 6.2.2 is being currently used) at https://ccl.northwestern.edu/netlogo/download.shtml
 -  **pynetlogo** library (more instruction at: https://pynetlogo.readthedocs.io/en/latest/install.html)

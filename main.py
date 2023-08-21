@@ -31,7 +31,8 @@ ncm.netlogo.command('A-Setup')
 ncm.netlogo.command('set default false')
 ncm.netlogo.repeat_command('B-go', 10) # Make the simulation evolve a bit to retrive reliable data
 INF= 100000
-unloading_processing = 30 # Unloading processing time, to be put at the beginning of the main
+unloading_processing = 30 # Unloading processing time
+setup_time = 10
 mass = 5
 time_interval = 1
 ##### BEGIN: SETUP of static objects and parameters (no. AGVs, machines position, etc...)
@@ -78,7 +79,6 @@ obstacles = [obstacles, ncm.log_stations_allpos()]
 obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
 ### LOOP: Evolution of the system overtime
 safety_distance = 8
-count = 0
 ###############################################################################################
 for tick in range(1,2000):
 	ncm.netlogo.repeat_command('B-Go', 10) # Apply the control each 10 iterations (= 0.5 seconds)
@@ -164,7 +164,7 @@ for tick in range(1,2000):
 			speed_tot = distance_from_unloading[index] / (expected_arrival_time + unloading_processing) # compute the average speed (assumed constant) needed to arrive at the destination at the precise time
 			speed_angle = np.arctan2(agv_p.y - target_pos[1], agv_p.x - target_pos[0]) # compute the angle with respect to the unloading machine
 			ncm.command_speed(agv_p.vehicle_id, -speed_tot*np.cos(speed_angle), -speed_tot*np.sin(speed_angle) , agv_p.product)
-			expected_arrival_time += unloading_processing +10 # update the expected arrival time for the following element of the platoon
+			expected_arrival_time += unloading_processing + setup_time # update the expected arrival time for the following element of the platoon
 			### END: Platoon control for AGVs who share destination
 	### BEGIN: Emergency control
 	distances = compute_agvs_distances(moving_agvs)

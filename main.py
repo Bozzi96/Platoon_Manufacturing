@@ -29,10 +29,11 @@ model_path = r'Platoon.nlogo'
 ncm.netlogo.load_model(model_path)
 ncm.netlogo.command('A-Setup')
 ncm.netlogo.command('set default false')
-ncm.netlogo.repeat_command('B-go', 10) # Make the simulation evolve a bit to retrive reliable data
+ncm.netlogo.repeat_command('B-go', 10) # Make the simulation evolve a bit to retrieve reliable data
 INF= 100000
 unloading_processing = 30 # Unloading processing time
 setup_time = 10
+safety_distance = 8
 mass = 5
 time_interval = 1
 ##### BEGIN: SETUP of static objects and parameters (no. AGVs, machines position, etc...)
@@ -78,7 +79,6 @@ obstacles = ncm.log_mach_allpos()
 obstacles = [obstacles, ncm.log_stations_allpos()]
 obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
 ### LOOP: Evolution of the system overtime
-safety_distance = 8
 ###############################################################################################
 for tick in range(1,2000):
 	ncm.netlogo.repeat_command('B-Go', 10) # Apply the control each 10 iterations (= 0.5 seconds)

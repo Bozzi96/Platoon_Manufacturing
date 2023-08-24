@@ -79,8 +79,11 @@ obstacles = ncm.log_mach_allpos()
 obstacles = [obstacles, ncm.log_stations_allpos()]
 obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
 ### LOOP: Evolution of the system overtime
+tick = 0
 ###############################################################################################
-for tick in range(1,2000):
+while ncm.count_product_completed() < P:
+#for tick in range(1,2000):
+	tick += 1
 	ncm.netlogo.repeat_command('B-Go', 10) # Apply the control each 10 iterations (= 0.5 seconds)
 	# Retrieve values from netlogo and update the structures that store data
 	agvs_info = ncm.log_veh_info()
@@ -103,7 +106,7 @@ for tick in range(1,2000):
 			### END: Potential field control
 			### BEGIN: Recharging decision after passing through the unloading unit
 		if agv.destination_entity == const.DEST_GETTINGIN and agv.y < 25:
-			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, M) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
+			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, N) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			if recharging:
 				rech_info = ncm.log_rech_info()
 				update_Stations(Stations, rech_info)
@@ -191,8 +194,8 @@ for tick in range(1,2000):
 	### END: Emergency control
 ###### END: Control algorithm
 	### Terminating condition
-	if ncm.count_product_completed() == P:
-		break
+# 	if ncm.count_product_completed() == P:
+# 		break
 ###############################################################################################
 #TODO: Store results (performance index)
 	

@@ -31,3 +31,6 @@ In _potentialField_controller.py_:
 - **attraction gain**: gain for the attraction force used when calling _calculate_attractive_force_
 - **static_gain, dynamic_gain**: gains for the repulsive force (specifically, for static and dynamic obstacles) used when calling _calculate_repulsive_force_moving_obstacles_
 - **safe_distance**: distance between obstacles to consider in the computation of the repulsive force, used when calling _calculate_repulsive_force_moving_obstacles_
+
+In _AGV.py_:
+-**Kr, Ka, Kb gains**: gains for the decision-making process regarding recharging scheduling

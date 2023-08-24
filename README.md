@@ -33,4 +33,4 @@ In _potentialField_controller.py_:
 - **safe_distance**: distance between obstacles to consider in the computation of the repulsive force, used when calling _calculate_repulsive_force_moving_obstacles_
 
 In _AGV.py_:
--**Kr, Ka, Kb gains**: gains for the decision-making process regarding recharging scheduling
+- **Kr, Ka, Kb gains**: gains for the decision-making process regarding recharging scheduling

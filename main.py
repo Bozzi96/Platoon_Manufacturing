@@ -78,6 +78,12 @@ obstacles = [] # Store position of machines and recharging stations to be used i
 obstacles = ncm.log_mach_allpos()
 obstacles = [obstacles, ncm.log_stations_allpos()]
 obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
+
+### Structure to store performance indexes
+average_battery_recharging = []
+speeds = np.empty((N,0))
+speeds_noPayload = {my_list: [] for my_list in range(1,N+1)}
+speeds_Payload = {my_list: [] for my_list in range(1,N+1)}
 ### LOOP: Evolution of the system overtime
 tick = 0
 ###############################################################################################
@@ -108,6 +114,7 @@ while ncm.count_product_completed() < P:
 		if agv.destination_entity == const.DEST_GETTINGIN and agv.y < 25:
 			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, N) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			if recharging:
+				average_battery_recharging.append(agv.battery)
 				rech_info = ncm.log_rech_info()
 				update_Stations(Stations, rech_info)
 				ncm.netlogo.command("O-ImposedNeedToCharge " + str(agv.vehicle_id))
@@ -192,10 +199,37 @@ while ncm.count_product_completed() < P:
 # 		   potential_speed = convert_force_to_speed(potential_force, mass, time_interval, agv.product)
 # 		   ncm.command_speed(agv_to_prioritize, potential_speed[0], potential_speed[1], agv.product)
 	### END: Emergency control
+	#speeds.append(ncm.get_speeds())
+	speeds = np.column_stack([speeds, ncm.get_speeds()])
+	for agv in AGVs:
+		if agv.product >= 1:
+			speeds_Payload[int(agv.vehicle_id)].append(speeds[int(agv.vehicle_id)-1,-1])
+		if agv.product < 1:
+			speeds_noPayload[int(agv.vehicle_id)].append(speeds[int(agv.vehicle_id)-1,-1])
 ###### END: Control algorithm
-	### Terminating condition
-# 	if ncm.count_product_completed() == P:
-# 		break
-###############################################################################################
+###################################################################################
 #TODO: Store results (performance index)
-	
+#%%
+makespan = tick/2 # Makespan
+average_battery = np.mean(average_battery_recharging) # Average battery percentage when recharging
+energy_consumption = ncm.get_energy_consumption() # Energy consumption for each vehicle
+speeds_with_nan = np.where(speeds < 0.001, np.nan, speeds) # Remove zero-elements to compute the average speed of AGVs only when they are moving
+average_speeds = np.nanmean(speeds_with_nan)
+rate_of_speed_change = np.diff(speeds, axis=1)
+average_speeds_Payload = []
+average_speeds_noPayload = []
+speeds_Payload_nan = speeds_Payload.copy() # Create a copy to have NaN values
+speeds_noPayload_nan = speeds_noPayload.copy() # Create a copy to have NaN values
+for key, value in speeds_Payload_nan.items():
+    if isinstance(value, float) and value < 0.001:
+        speeds_Payload_nan[key] = float('nan')
+    elif isinstance(value, list):
+        speeds_Payload_nan[key] = [v if v >= 0.001 else float('nan') for v in value]
+for key, value in speeds_noPayload_nan.items():
+    if isinstance(value, float) and value < 0.001:
+        speeds_noPayload_nan[key] = float('nan')
+    elif isinstance(value, list):
+        speeds_noPayload_nan[key] = [v if v >= 0.001 else float('nan') for v in value]
+for i in range(1,N+1):	
+	average_speeds_Payload.append(np.nanmean(speeds_Payload_nan[i]))
+	average_speeds_noPayload.append(np.nanmean(speeds_noPayload_nan[i]))

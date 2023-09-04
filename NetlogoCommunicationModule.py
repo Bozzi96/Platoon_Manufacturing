@@ -8,6 +8,7 @@ Created on Wed May 31 14:43:40 2023
 ### SETUP of Netlogo
 import pyNetLogo
 import constant as const
+import numpy as np
 import math
 global netlogo
 netlogo = pyNetLogo.NetLogoLink(gui=True) #Show NetLogo GUI
@@ -192,3 +193,15 @@ def get_unloading_completion():
 
 def get_unloading_availability():
 	return netlogo.report("[machinestate] of machine 11" )
+
+def get_energy_consumption():
+	energy = netlogo.report("[(list VehicleId vehicleacumenergy)] of vehicles" )
+	energy = energy[energy[:, 0].argsort()] # Sort elements by VehicleId
+	np.delete(energy,0,axis=1) # Delete the first column to keep only the energy values
+	return energy
+
+def get_speeds():
+	speeds = netlogo.report("[(list VehicleId vehiclespeed-total)] of vehicles")
+	speeds = speeds[speeds[:,0].argsort()] # Sort elements by VehicleId
+	np.delete(speeds,0,axis=1) # Delete the first column to keep only the energy values
+	return speeds

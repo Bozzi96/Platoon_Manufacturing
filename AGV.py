@@ -194,6 +194,8 @@ def update_AGVs(AGVs, agvs_info):
 		if agv is not None:
 			agv.x = info[0]
 			agv.y = info[1]
+			agv.v_x = info[3]
+			agv.v_y = info[4]
 			agv.battery = (info[5]/(21*agv.vehicle_type))*100 # Get the battery in %
 			agv.state = info[6]
 			agv.product = info[7]

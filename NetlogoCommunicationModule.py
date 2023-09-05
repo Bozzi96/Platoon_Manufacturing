@@ -164,8 +164,13 @@ def log_rech_info():
 
 MAX_SPEED_PAYLOAD = 0.5
 MAX_SPEED_NO_PAYLOAD = 0.8
-def command_speed(vehicle_id, speed_x, speed_y, payload):
+MAX_RATE = 0.2
+def command_speed(vehicle_id, speed_x, speed_y, payload, current_speed):
 	total_speed = math.sqrt(speed_x**2 + speed_y**2)
+	if (total_speed - current_speed > MAX_RATE):
+		total_speed = current_speed + MAX_RATE
+	if (-total_speed+current_speed < - MAX_RATE):
+		total_speed = -current_speed - MAX_RATE
 	if total_speed > MAX_SPEED_PAYLOAD and payload > 0: #Speed exceeds the maximum speed for AGV with payload
 		scaling_factor = MAX_SPEED_PAYLOAD/total_speed
 		speed_x = speed_x * scaling_factor

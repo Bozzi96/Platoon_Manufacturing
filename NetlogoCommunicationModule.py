@@ -202,11 +202,11 @@ def get_unloading_availability():
 def get_energy_consumption():
 	energy = netlogo.report("[(list VehicleId vehicleacumenergy)] of vehicles" )
 	energy = energy[energy[:, 0].argsort()] # Sort elements by VehicleId
-	np.delete(energy,0,axis=1) # Delete the first column to keep only the energy values
+	energy = np.delete(energy,0,axis=1) # Delete the first column to keep only the energy values
 	return energy
 
 def get_speeds():
 	speeds = netlogo.report("[(list VehicleId vehiclespeed-total)] of vehicles")
 	speeds = speeds[speeds[:,0].argsort()] # Sort elements by VehicleId
-	np.delete(speeds,0,axis=1) # Delete the first column to keep only the energy values
+	speeds = np.delete(speeds,0,axis=1) # Delete the first column to keep only the energy values
 	return speeds

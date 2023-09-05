@@ -16,6 +16,7 @@ import NetlogoCommunicationModule as ncm
 import constant as const
 import numpy as np
 import math
+import csv
 from AGV import AGV, update_AGVs, compute_agvs_distances, recharge_decision
 from Product import Product
 from Machine import Machine
@@ -214,8 +215,9 @@ makespan = tick/2 # Makespan
 average_battery = np.mean(average_battery_recharging) # Average battery percentage when recharging
 energy_consumption = ncm.get_energy_consumption() # Energy consumption for each vehicle
 speeds_with_nan = np.where(speeds < 0.001, np.nan, speeds) # Remove zero-elements to compute the average speed of AGVs only when they are moving
-average_speeds = np.nanmean(speeds_with_nan)
+average_speeds = np.nanmean(speeds_with_nan, axis=1)
 rate_of_speed_change = np.diff(speeds, axis=1)
+average_rate_change = np.mean(rate_of_speed_change, axis=1)
 average_speeds_Payload = []
 average_speeds_noPayload = []
 speeds_Payload_nan = speeds_Payload.copy() # Create a copy to have NaN values
@@ -233,3 +235,20 @@ for key, value in speeds_noPayload_nan.items():
 for i in range(1,N+1):	
 	average_speeds_Payload.append(np.nanmean(speeds_Payload_nan[i]))
 	average_speeds_noPayload.append(np.nanmean(speeds_noPayload_nan[i]))
+#Format numbers
+makespan = np.round(makespan,3)
+average_speeds = np.round(average_speeds,3)
+average_speeds_Payload = np.round(average_speeds_Payload,3)
+average_speeds_noPayload = np.round(average_speeds_noPayload,3)
+average_rate_change = np.round(average_rate_change,3)
+energy_consumption = np.round(energy_consumption,3)
+average_battery = np.round(average_battery,3)
+### Record results on csv file
+csv_file = 'results.csv'
+with open(csv_file, 'a', newline='') as file:
+	writer = csv.writer(file)
+# Makespan 1 - Average Speeds 2-->11 - Average Speeds with Payload 12-->21 -  Average Speeds without Payload 22--> 31 ....
+# Energy Consumption 32-->41 - Rate of Speed 42-->51 - Average Battery when Recharging 52
+	writer.writerow([makespan, ', '.join(map(str, average_speeds)), ', '.join(map(str, average_speeds_Payload)),  
+				  ', '.join(map(str, average_speeds_noPayload)), ', '.join(map(str, energy_consumption)), 
+				   ', '.join(map(str, average_rate_change)),', ', average_battery])

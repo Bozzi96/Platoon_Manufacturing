@@ -1,7 +1,0 @@
-1) Loading and Unloading unit are not machines
-2) Loading and Unloading unit do not have a processing time (reasonable to have one for platooning control purposes)
-3) How to change the VehicleDestinationNode to consider which recharging station is choosen for AGV recharging? More in general, what is the VehicleDestinationNode parameter? (complete explanation of VehicleDestinationNode for each possible VehicleDestinationEntity)
-4) When a vehicle is in the queue it is difficult to handle it. Moreover, it is not the best option to have AGVs waiting and wasting space within the shopfloor. Maybe it would be the best option to have a "pre-machine area" which is out of control scope.
-5) VehicleWithProduct returns the product "who", instead of the product "id"
-
-PS. Find a "termination" condition (i.e. something to end the program and store the performance index). For instance, the program ends when the last product has left the shopfloor (how to identify that time instant?)

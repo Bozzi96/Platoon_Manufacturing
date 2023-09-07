@@ -1,0 +1,2 @@
+The structure of results in the .xlsx file is the following:
+Makespan 1 // Average Speeds 2-->11 // Average Speeds with Payload 12-->21 // Average Speeds without Payload 22--> 31 // Energy Consumption 32-->41 // Rate of Speed 42-->51 // Number of recharged vehicles 52 // Average Battery when Recharging 53

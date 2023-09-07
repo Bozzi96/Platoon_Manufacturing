@@ -447,12 +447,12 @@ to J-CreatingProductionOrder       ; ID, ProductType, Release order, DueDate
     K-CreatingProduct 235 7 35 2000
     K-CreatingProduct 236 5 36 2000
 
-    ; MEDIUM scenario: 6 product types (1,2,4,5,8,10) -- Order: 1-2-1-4-4-5-8-10-2-8-8-5 x3
+    ; MEDIUM scenario: 6 product types (1,2,4,5,8,10) -- Order: 1-2-1-10-4-5-8-10-2-8-8-5 x3
 ;    K-CreatingProduct 201 1 1 2000
 ;    K-CreatingProduct 202 2 2 2000
-;    K-CreatingProduct 203 1 3 2000
-;    K-CreatingProduct 204 4 4 2000
-;    K-CreatingProduct 205 4 5 2000
+;    K-CreatingProduct 203 5 3 2000
+;    K-CreatingProduct 204 10 4 2000
+;    K-CreatingProduct 205 6 5 2000
 ;    K-CreatingProduct 206 5 6 2000
 ;    K-CreatingProduct 207 8 7 2000
 ;    K-CreatingProduct 208 10 8 2000
@@ -462,9 +462,9 @@ to J-CreatingProductionOrder       ; ID, ProductType, Release order, DueDate
 ;    K-CreatingProduct 212 5 12 2000
 ;    K-CreatingProduct 213 1 13 2000
 ;    K-CreatingProduct 214 2 14 2000
-;    K-CreatingProduct 215 1 15 2000
-;    K-CreatingProduct 216 4 16 2000
-;    K-CreatingProduct 217 4 17 2000
+;    K-CreatingProduct 215 5 15 2000
+;    K-CreatingProduct 216 10 16 2000
+;    K-CreatingProduct 217 6 17 2000
 ;    K-CreatingProduct 218 5 18 2000
 ;    K-CreatingProduct 219 8 19 2000
 ;    K-CreatingProduct 220 10 20 2000
@@ -474,9 +474,9 @@ to J-CreatingProductionOrder       ; ID, ProductType, Release order, DueDate
 ;    K-CreatingProduct 224 5 24 2000
 ;    K-CreatingProduct 225 1 25 2000
 ;    K-CreatingProduct 226 2 26 2000
-;    K-CreatingProduct 227 1 27 2000
-;    K-CreatingProduct 228 4 28 2000
-;    K-CreatingProduct 229 4 29 2000
+;    K-CreatingProduct 227 5 27 2000
+;    K-CreatingProduct 228 10 28 2000
+;    K-CreatingProduct 229 6 29 2000
 ;    K-CreatingProduct 230 5 30 2000
 ;    K-CreatingProduct 231 8 31 2000
 ;    K-CreatingProduct 232 10 32 2000
@@ -485,43 +485,43 @@ to J-CreatingProductionOrder       ; ID, ProductType, Release order, DueDate
 ;    K-CreatingProduct 235 8 35 2000
 ;    K-CreatingProduct 236 5 36 2000
 
-    ; HARD scenario: 8 product types (1,2,3,5,6,7,9,10) -- Order: 1-2-2-3-5-6-6-7-9-10-9-10 x3
+    ; HARD scenario: 8 product types (1,2,3,5,6,7,9,10) -- Order:  1-2-10-3-6-5-10-7-9-9-1-6 x3
 ;    K-CreatingProduct 201 1 1 2000
 ;    K-CreatingProduct 202 2 2 2000
-;    K-CreatingProduct 203 2 3 2000
+;    K-CreatingProduct 203 10 3 2000
 ;    K-CreatingProduct 204 3 4 2000
-;    K-CreatingProduct 205 5 5 2000
-;    K-CreatingProduct 206 6 6 2000
-;    K-CreatingProduct 207 6 7 2000
+;    K-CreatingProduct 205 6 5 2000
+;    K-CreatingProduct 206 5 6 2000
+;    K-CreatingProduct 207 10 7 2000
 ;    K-CreatingProduct 208 7 8 2000
 ;    K-CreatingProduct 209 9 9 2000
-;    K-CreatingProduct 210 10 10 2000
-;    K-CreatingProduct 211 9 11 2000
-;    K-CreatingProduct 212 10 12 2000
+;    K-CreatingProduct 210 9 10 2000
+;    K-CreatingProduct 211 1 11 2000
+;    K-CreatingProduct 212 6 12 2000
 ;    K-CreatingProduct 213 1 13 2000
 ;    K-CreatingProduct 214 2 14 2000
-;    K-CreatingProduct 215 2 15 2000
+;    K-CreatingProduct 215 10 15 2000
 ;    K-CreatingProduct 216 3 16 2000
-;    K-CreatingProduct 217 5 17 2000
-;    K-CreatingProduct 218 6 18 2000
-;    K-CreatingProduct 219 6 19 2000
+;    K-CreatingProduct 217 6 17 2000
+;    K-CreatingProduct 218 5 18 2000
+;    K-CreatingProduct 219 10 19 2000
 ;    K-CreatingProduct 220 7 20 2000
 ;    K-CreatingProduct 221 9 21 2000
-;    K-CreatingProduct 222 10 22 2000
-;    K-CreatingProduct 223 9 23 2000
-;    K-CreatingProduct 224 10 24 2000
+;    K-CreatingProduct 222 9 22 2000
+;    K-CreatingProduct 223 1 23 2000
+;    K-CreatingProduct 224 6 24 2000
 ;    K-CreatingProduct 225 1 25 2000
 ;    K-CreatingProduct 226 2 26 2000
-;    K-CreatingProduct 227 2 27 2000
+;    K-CreatingProduct 227 10 27 2000
 ;    K-CreatingProduct 228 3 28 2000
-;    K-CreatingProduct 229 5 29 2000
-;    K-CreatingProduct 230 6 30 2000
-;    K-CreatingProduct 231 6 31 2000
+;    K-CreatingProduct 229 6 29 2000
+;    K-CreatingProduct 230 5 30 2000
+;    K-CreatingProduct 231 10 31 2000
 ;    K-CreatingProduct 232 7 32 2000
 ;    K-CreatingProduct 233 9 33 2000
-;    K-CreatingProduct 234 10 34 2000
-;    K-CreatingProduct 235 9 35 2000
-;    K-CreatingProduct 236 10 36 2000
+;    K-CreatingProduct 234 9 34 2000
+;    K-CreatingProduct 235 1 35 2000
+;    K-CreatingProduct 236 6 36 2000
   ]
 
   if (Default = False)[
@@ -535,110 +535,109 @@ to J-CreatingProductionOrder       ; ID, ProductType, Release order, DueDate
     K-CreatingProduct 207 1 7 2000
     K-CreatingProduct 208 3 8 2000
     K-CreatingProduct 209 5 9 2000
-;    K-CreatingProduct 210 5 10 2000
-;    K-CreatingProduct 211 7 11 2000
-;    K-CreatingProduct 212 5 12 2000
-;    K-CreatingProduct 213 1 13 2000
-;    K-CreatingProduct 214 3 14 2000
-;    K-CreatingProduct 215 5 15 2000
-;    K-CreatingProduct 216 3 16 2000
-;    K-CreatingProduct 217 3 17 2000
-;    K-CreatingProduct 218 1 18 2000
-;    K-CreatingProduct 219 1 19 2000
-;    K-CreatingProduct 220 7 20 2000
-;    K-CreatingProduct 221 5 21 2000
-;    K-CreatingProduct 222 5 22 2000
-;    K-CreatingProduct 223 7 23 2000
-;    K-CreatingProduct 224 5 24 2000
-;    K-CreatingProduct 225 1 25 2000
-;    K-CreatingProduct 226 3 26 2000
-;    K-CreatingProduct 227 5 27 2000
-;    K-CreatingProduct 228 3 28 2000
-;    K-CreatingProduct 229 3 29 2000
-;    K-CreatingProduct 230 1 30 2000
-;    K-CreatingProduct 231 1 31 2000
-;    K-CreatingProduct 232 7 32 2000
-;    K-CreatingProduct 233 5 33 2000
-;    K-CreatingProduct 234 5 34 2000
-;    K-CreatingProduct 235 7 35 2000
-;    K-CreatingProduct 236 5 36 2000
+    K-CreatingProduct 210 5 10 2000
+    K-CreatingProduct 211 7 11 2000
+    K-CreatingProduct 212 5 12 2000
+    K-CreatingProduct 213 1 13 2000
+    K-CreatingProduct 214 3 14 2000
+    K-CreatingProduct 215 5 15 2000
+    K-CreatingProduct 216 3 16 2000
+    K-CreatingProduct 217 3 17 2000
+    K-CreatingProduct 218 1 18 2000
+    K-CreatingProduct 219 1 19 2000
+    K-CreatingProduct 220 7 20 2000
+    K-CreatingProduct 221 5 21 2000
+    K-CreatingProduct 222 5 22 2000
+    K-CreatingProduct 223 7 23 2000
+    K-CreatingProduct 224 5 24 2000
+    K-CreatingProduct 225 1 25 2000
+    K-CreatingProduct 226 3 26 2000
+    K-CreatingProduct 227 5 27 2000
+    K-CreatingProduct 228 3 28 2000
+    K-CreatingProduct 229 3 29 2000
+    K-CreatingProduct 230 1 30 2000
+    K-CreatingProduct 231 1 31 2000
+    K-CreatingProduct 232 7 32 2000
+    K-CreatingProduct 233 5 33 2000
+    K-CreatingProduct 234 5 34 2000
+    K-CreatingProduct 235 7 35 2000
+    K-CreatingProduct 236 5 36 2000
 
-        ; MEDIUM scenario: 6 product types (1,2,4,5,8,10) -- Order: 1-2-1-4-4-5-8-10-2-8-8-5 x3
+        ; MEDIUM scenario: 6 product types (1,2,4,5,8,10) -- Order: 1-2-5-10-4-5-8-10-2-8-8-5 x3
 ;    K-CreatingProduct 201 1 1 2000
 ;    K-CreatingProduct 202 2 2 2000
-;    K-CreatingProduct 203 1 3 2000
-;    K-CreatingProduct 204 4 4 2000
-;    K-CreatingProduct 205 4 5 2000
-;    K-CreatingProduct 206 5 6 2000
+;    K-CreatingProduct 203 4 3 2000
+;    K-CreatingProduct 204 5 4 2000
+;    K-CreatingProduct 205 9 5 2000
+;    K-CreatingProduct 206 2 6 2000
 ;    K-CreatingProduct 207 8 7 2000
-;    K-CreatingProduct 208 10 8 2000
-;    K-CreatingProduct 209 2 9 2000
+;    K-CreatingProduct 208 1 8 2000
+;    K-CreatingProduct 209 9 9 2000
 ;    K-CreatingProduct 210 8 10 2000
 ;    K-CreatingProduct 211 8 11 2000
 ;    K-CreatingProduct 212 5 12 2000
 ;    K-CreatingProduct 213 1 13 2000
 ;    K-CreatingProduct 214 2 14 2000
-;    K-CreatingProduct 215 1 15 2000
-;    K-CreatingProduct 216 4 16 2000
-;    K-CreatingProduct 217 4 17 2000
-;    K-CreatingProduct 218 5 18 2000
+;    K-CreatingProduct 215 4 15 2000
+;    K-CreatingProduct 216 5 16 2000
+;    K-CreatingProduct 217 9 17 2000
+;    K-CreatingProduct 218 2 18 2000
 ;    K-CreatingProduct 219 8 19 2000
-;    K-CreatingProduct 220 10 20 2000
-;    K-CreatingProduct 221 2 21 2000
+;    K-CreatingProduct 220 1 20 2000
+;    K-CreatingProduct 221 9 21 2000
 ;    K-CreatingProduct 222 8 22 2000
 ;    K-CreatingProduct 223 8 23 2000
 ;    K-CreatingProduct 224 5 24 2000
 ;    K-CreatingProduct 225 1 25 2000
 ;    K-CreatingProduct 226 2 26 2000
-;    K-CreatingProduct 227 1 27 2000
-;    K-CreatingProduct 228 4 28 2000
-;    K-CreatingProduct 229 4 29 2000
-;    K-CreatingProduct 230 5 30 2000
+;    K-CreatingProduct 227 4 27 2000
+;    K-CreatingProduct 228 5 28 2000
+;    K-CreatingProduct 229 9 29 2000
+;    K-CreatingProduct 230 2 30 2000
 ;    K-CreatingProduct 231 8 31 2000
-;    K-CreatingProduct 232 10 32 2000
-;    K-CreatingProduct 233 2 33 2000
+;    K-CreatingProduct 232 1 32 2000
+;    K-CreatingProduct 233 9 33 2000
 ;    K-CreatingProduct 234 8 34 2000
 ;    K-CreatingProduct 235 8 35 2000
 ;    K-CreatingProduct 236 5 36 2000
 
-
-     ; HARD scenario: 8 product types (1,2,3,5,6,7,9,10) -- Order: 1-2-2-3-5-6-6-7-9-10-9-10 x3
+     ; HARD scenario: 8 product types (1,2,3,5,6,7,9,10) -- Order: 1-2-10-3-6-5-10-7-9-9-1-6 x3
 ;    K-CreatingProduct 201 1 1 2000
 ;    K-CreatingProduct 202 2 2 2000
-;    K-CreatingProduct 203 2 3 2000
+;    K-CreatingProduct 203 10 3 2000
 ;    K-CreatingProduct 204 3 4 2000
-;    K-CreatingProduct 205 5 5 2000
-;    K-CreatingProduct 206 6 6 2000
-;    K-CreatingProduct 207 6 7 2000
+;    K-CreatingProduct 205 6 5 2000
+;    K-CreatingProduct 206 5 6 2000
+;    K-CreatingProduct 207 10 7 2000
 ;    K-CreatingProduct 208 7 8 2000
 ;    K-CreatingProduct 209 9 9 2000
-;    K-CreatingProduct 210 10 10 2000
-;    K-CreatingProduct 211 9 11 2000
-;    K-CreatingProduct 212 10 12 2000
+;    K-CreatingProduct 210 9 10 2000
+;    K-CreatingProduct 211 1 11 2000
+;    K-CreatingProduct 212 6 12 2000
 ;    K-CreatingProduct 213 1 13 2000
 ;    K-CreatingProduct 214 2 14 2000
-;    K-CreatingProduct 215 2 15 2000
+;    K-CreatingProduct 215 10 15 2000
 ;    K-CreatingProduct 216 3 16 2000
-;    K-CreatingProduct 217 5 17 2000
-;    K-CreatingProduct 218 6 18 2000
-;    K-CreatingProduct 219 6 19 2000
+;    K-CreatingProduct 217 6 17 2000
+;    K-CreatingProduct 218 5 18 2000
+;    K-CreatingProduct 219 10 19 2000
 ;    K-CreatingProduct 220 7 20 2000
 ;    K-CreatingProduct 221 9 21 2000
-;    K-CreatingProduct 222 10 22 2000
-;    K-CreatingProduct 223 9 23 2000
-;    K-CreatingProduct 224 10 24 2000
+;    K-CreatingProduct 222 9 22 2000
+;    K-CreatingProduct 223 1 23 2000
+;    K-CreatingProduct 224 6 24 2000
 ;    K-CreatingProduct 225 1 25 2000
 ;    K-CreatingProduct 226 2 26 2000
-;    K-CreatingProduct 227 2 27 2000
+;    K-CreatingProduct 227 10 27 2000
 ;    K-CreatingProduct 228 3 28 2000
-;    K-CreatingProduct 229 5 29 2000
-;    K-CreatingProduct 230 6 30 2000
-;    K-CreatingProduct 231 6 31 2000
+;    K-CreatingProduct 229 6 29 2000
+;    K-CreatingProduct 230 5 30 2000
+;    K-CreatingProduct 231 10 31 2000
 ;    K-CreatingProduct 232 7 32 2000
 ;    K-CreatingProduct 233 9 33 2000
-;    K-CreatingProduct 234 10 34 2000
-;    K-CreatingProduct 235 9 35 2000
-;    K-CreatingProduct 236 10 36 2000
+;    K-CreatingProduct 234 9 34 2000
+;    K-CreatingProduct 235 1 35 2000
+;    K-CreatingProduct 236 6 36 2000
   ]
 
 end
@@ -657,7 +656,7 @@ to K-CreatingProduct [#1 #2 #3 #4] ; #1: Id of product, #2: Type of product, #3:
     if (productType = 2) [set ProductWeight 20 set ProductOperations (list 0 1 5 8 11)]
     if (productType = 3) [set ProductWeight 20 set ProductOperations (list 0 1 3 9 11)]
     if (productType = 4) [set ProductWeight 20 set ProductOperations (list 0 1 4 6 8 11)]
-    if (productType = 5) [set ProductWeight 20 set ProductOperations (list 0 2 5 6 9 11)]
+    if (productType = 5) [set ProductWeight 20 set ProductOperations (list 0 2 5 8 9 11)]
     if (productType = 6) [set ProductWeight 30 set ProductOperations (list 0 1 5 7 11)]
     if (productType = 7) [set ProductWeight 30 set ProductOperations (list 0 2 5 8 11)]
     if (productType = 8) [set ProductWeight 30 set ProductOperations (list 0 3 5 9 11)]
@@ -770,7 +769,7 @@ to O-ImposedNeedToCharge [#1]
     if ((count vehicles with [VehicleState =  5] + count vehicles with [VehicleState = 6]) < 5)[   ;
       set VehicleState 5
       set vehicleDestinationEntity 3
-      set VehicleDestinationNode one-of Recharge-Stations with [Rech.ReservedForVehicle = 0]
+      set VehicleDestinationNode one-of Recharge-Stations with [Rech.State = 0]
       face VehicleDestinationNode
       set heading precision heading 3
       let tempVehicleAssignStation who
@@ -925,7 +924,7 @@ to X-SetupMachines
   ask machine 8 [set MachineID 8 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 8)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
   ask machine 9 [set MachineID 9 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 9)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
   ask machine 10 [set MachineID 10 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 10)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
-  ask machine 11 [set MachineID 11 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 11)  set MachineOperProcessingTime  (list 30) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
+  ask machine 11 [set MachineID 11 set MachineType "Normal" set MachineState 0 set MachinePossibleOperations  (list 11)  set MachineOperProcessingTime  (list 15) set MachineNextCompletion  100000000 set MachineProcessingProduct 0]
 
 end
 

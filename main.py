@@ -33,7 +33,7 @@ ncm.netlogo.command('set default false')
 ncm.netlogo.repeat_command('B-go', 10) # Make the simulation evolve a bit to retrieve reliable data
 INF= 100000
 unloading_processing = 30 # Unloading processing time
-setup_time = 10
+setup_time = 15
 safety_distance = 8
 mass = 5
 time_interval = 1
@@ -81,10 +81,11 @@ obstacles = [obstacles, ncm.log_stations_allpos()]
 obstacles = np.concatenate((obstacles[0], obstacles[1]), axis=0)
 
 ### Structure to store performance indexes
-average_battery_recharging = []
+battery_when_recharging = []
 speeds = np.empty((N,0))
 speeds_noPayload = {my_list: [] for my_list in range(1,N+1)}
 speeds_Payload = {my_list: [] for my_list in range(1,N+1)}
+vehicles_recharged = 0
 ### LOOP: Evolution of the system overtime
 tick = 0
 ###############################################################################################
@@ -100,7 +101,7 @@ while ncm.count_product_completed() < P:
 	## 0. Retrieve position and destination of each vehicle
 ###### BEGIN: Control algorithm
 	# Consider only the AGVs that are currently moving within the shopfloor
-	moving_agvs = [agv for agv in AGVs if agv.state == const.MOVING]
+	moving_agvs = [agv for agv in AGVs if agv.state == const.MOVING or agv.state == const.GOING_CHARGER]
 	for agv in moving_agvs:
 		if agv.destination_entity == const.DEST_MACHINE:
 			### BEGIN: Potential field control
@@ -115,12 +116,13 @@ while ncm.count_product_completed() < P:
 		if agv.destination_entity == const.DEST_GETTINGIN and agv.y < 25:
 			recharging = recharge_decision(agv, rech_free, S, agvs_waiting, N) # TODO: verify if M is the correct choice, or if it is better to take the number of AGV currently in the shopfloor
 			if recharging:
-				average_battery_recharging.append(agv.battery)
+				vehicles_recharged += 1
+				battery_when_recharging.append(agv.battery)
 				rech_info = ncm.log_rech_info()
 				update_Stations(Stations, rech_info)
 				ncm.netlogo.command("O-ImposedNeedToCharge " + str(agv.vehicle_id))
 				agv.destination_entity = const.DEST_CHARGINGSTATION
-				recharge_dest = find_free_recharging_station(Stations)
+				recharge_dest = find_free_recharging_station(Stations, vehicles_recharged)
 				agv.destination_node = recharge_dest
 				ncm.command_destination(agv.vehicle_id, const.DEST_CHARGINGSTATION, recharge_dest) # Maybe a +/- 11 is needed to "fix" the offset between rech_id and destination node
 			### END: Recharging decision
@@ -212,7 +214,7 @@ while ncm.count_product_completed() < P:
 #TODO: Store results (performance index)
 #%%
 makespan = tick/2 # Makespan
-average_battery = np.mean(average_battery_recharging) # Average battery percentage when recharging
+average_battery = np.mean(battery_when_recharging) # Average battery percentage when recharging
 energy_consumption = ncm.get_energy_consumption() # Energy consumption for each vehicle
 speeds_with_nan = np.where(speeds < 0.001, np.nan, speeds) # Remove zero-elements to compute the average speed of AGVs only when they are moving
 average_speeds = np.nanmean(speeds_with_nan, axis=1)
@@ -248,7 +250,7 @@ csv_file = 'results.csv'
 with open(csv_file, 'a', newline='') as file:
 	writer = csv.writer(file)
 # Makespan 1 - Average Speeds 2-->11 - Average Speeds with Payload 12-->21 -  Average Speeds without Payload 22--> 31 ....
-# Energy Consumption 32-->41 - Rate of Speed 42-->51 - Average Battery when Recharging 52
+# Energy Consumption 32-->41 - Rate of Speed 42-->51 - Number of recharged vehicles 52 - Average Battery when Recharging 53
 	writer.writerow([makespan, ', '.join(map(str, average_speeds)), ', '.join(map(str, average_speeds_Payload)),  
 				  ', '.join(map(str, average_speeds_noPayload)), ', '.join(map(str, energy_consumption)), 
-				   ', '.join(map(str, average_rate_change)),', ', average_battery])
+				   ', '.join(map(str, average_rate_change)),', ', vehicles_recharged, ', ', average_battery])

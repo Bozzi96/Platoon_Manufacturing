@@ -19,8 +19,12 @@ def get_target_position(entity,node, machines):
 			   y = target_machine.y
 	elif entity == const.DEST_CHARGINGSTATION:
 		target_station = next((station for station in machines if (station.station_id) == node), None)
-		x = target_station.x
-		y = target_station.y
+		if target_station == None:
+			x = 256
+			y = 80
+		else:
+			x = target_station.x
+			y = target_station.y
 	else: # Going to unloading station		
 		x = 34
 		y = 50

@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 31 13:18:30 2023
+Created on Wed Jan 24 14:22:42 2024
 
 @author: bozzi
-
-Main file, needed to make Netlogo interact with Python and to:
-	- plan trajectories
-	- schedule AGVs recharging
-	- form platoons to achieve energy efficient movement to shared resources
 """
-
 
 ### IMPORT
 import NetlogoCommunicationModule as ncm
@@ -104,10 +98,11 @@ while ncm.count_product_completed() < P:
 	# Consider only the AGVs that are currently moving within the shopfloor
 	moving_agvs = [agv for agv in AGVs if agv.state == const.MOVING or agv.state == const.GOING_CHARGER]
 	for agv in moving_agvs:
-		if agv.get_v_x() + agv.get_v_y() < 0.01 and agv.get_x() > 30 and agv.get_x() <60 and \
+		# Get the time spent waiting for machine completion at the unloading unit
+		if agv.get_v_x() + agv.get_v_y() < 0.01 and agv.get_x() >30 and agv.get_x() <60 and \
 			agv.get_y() > 30 and agv.get_y() < 70 and agv.get_state() == const.MOVING :
 				time_in_congestion = time_in_congestion + 1
-		if agv.destination_entity == const.DEST_MACHINE:
+		if agv.destination_entity == const.DEST_MACHINE or agv.destination_entity == const.DEST_UNLOADINGSTATION:
 			### BEGIN: Potential field control
 			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Machines)
 			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
@@ -132,13 +127,13 @@ while ncm.count_product_completed() < P:
 			### END: Recharging decision
 			### BEGIN: Handle AGVs who have different destinations (charging stations, unloading unit)
 		if agv.destination_entity == const.DEST_CHARGINGSTATION:
-			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Stations)
-			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
-			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
-			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
-			potential_speed = convert_force_to_speed(potential_force, mass, time_interval, agv.product)
-			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product, math.sqrt(agv.v_x**2 + agv.v_y**2))
-			agv.platoon_type = const.PLATOON_CHARGING # add agv to platoon 
+ 			target_pos = get_target_position(agv.destination_entity, agv.destination_node, Stations)
+ 			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
+ 			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != agv.vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
+ 			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
+ 			potential_speed = convert_force_to_speed(potential_force, mass, time_interval, agv.product)
+ 			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product, math.sqrt(agv.v_x**2 + agv.v_y**2))
+# 			agv.platoon_type = const.PLATOON_CHARGING # add agv to platoon 
 		if agv.destination_entity == const.DEST_GETTINGIN: # After recharging AGVs need to go back to the queue
  			target_pos = (34.0, 15.0)
  			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
@@ -146,42 +141,46 @@ while ncm.count_product_completed() < P:
  			potential_force = potential_field_controller(target_pos, [agv.x, agv.y], static_obstacles, moving_obstacles)
  			potential_speed = convert_force_to_speed(potential_force, mass, time_interval, agv.product)
  			ncm.command_speed(agv.vehicle_id, potential_speed[0], potential_speed[1], agv.product, math.sqrt(agv.v_x**2 + agv.v_y**2))
-		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
-			agv.platoon_type = const.PLATOON_UNLOADING # add agv to platoon 
-			### END: Handle AGVs who have different destinations (charging stations, unloading unit)
-		### BEGIN: Platoon control for AGVs who share destination
-	#platoon_charging = [agv for agv in AGVs if agv.platoon_type == const.PLATOON_CHARGING]
-	platoon_unloading = [agv for agv in AGVs if agv.platoon_type == const.PLATOON_UNLOADING]
-	if platoon_unloading: #If it is not empty (--> at least one AGV is going to unloading)
-		target_pos = (34.0, 50.0)
-		distance_from_unloading = [np.sqrt((agv.x - target_pos[0])**2 + (agv.y - target_pos[1])**2) for agv in platoon_unloading] 	# Calculate distance of each AGV from the fixed point
-		sorted_indices = np.argsort(distance_from_unloading) # Sort the AGVs based on their distances
-		# Assign the position attribute in increasing order based on the sorted indices
-		for position, index in enumerate(sorted_indices):
-			   platoon_unloading[index].platoon_position = position + 1
-		platoon_unloading.sort(key=lambda agv: agv.platoon_position) # Sort platoon based on platoon_position
-		distance_from_unloading.sort()
-		if ncm.get_unloading_availability() == const.IDLE:
-			# Unloading unit is free
-			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
-			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != platoon_unloading[0].vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
-			potential_force = potential_field_controller(target_pos, [platoon_unloading[0].x, platoon_unloading[0].y], static_obstacles, moving_obstacles)
-			potential_speed = convert_force_to_speed(potential_force, mass, time_interval, platoon_unloading[0].product)
-			ncm.command_speed(platoon_unloading[0].vehicle_id, potential_speed[0], potential_speed[1], platoon_unloading[0].product, math.sqrt(platoon_unloading[0].v_x**2 + platoon_unloading[0].v_y**2))
-			expected_arrival_time = tick/2 + distance_from_unloading[0]/(math.sqrt(potential_speed[0]**2 + potential_speed[1]**2)) + unloading_processing # compute the expected arrival time of the first element of the platoon, *10 to match from tick to seconds
-		else:
-			# Unloading unit is occupied
-			expected_arrival_time = ncm.get_unloading_completion()
-			speed_tot = distance_from_unloading[0] / expected_arrival_time
-			speed_angle = np.arctan2(platoon_unloading[0].y - target_pos[1], platoon_unloading[0].x - target_pos[0]) # compute the angle with respect to the unloading machine
-			ncm.command_speed(platoon_unloading[0].vehicle_id, -speed_tot*np.cos(speed_angle), -speed_tot*np.sin(speed_angle) , platoon_unloading[0].product, math.sqrt(platoon_unloading[0].v_x**2 + platoon_unloading[0].v_y**2))
-		for index, (agv_p, distance) in enumerate(zip(platoon_unloading[1:], distance_from_unloading[:-1])): # loop over each agv starting from the second, and for each distance except the last one
-			# Iterate through all the platoon except the first element
-			# Compute angle and speed_x and speed_y for each agv
-			speed_tot = distance_from_unloading[index] / (expected_arrival_time + unloading_processing) # compute the average speed (assumed constant) needed to arrive at the destination at the precise time
-			speed_angle = np.arctan2(agv_p.y - target_pos[1], agv_p.x - target_pos[0]) # compute the angle with respect to the unloading machine
-			ncm.command_speed(agv_p.vehicle_id, -speed_tot*np.cos(speed_angle), -speed_tot*np.sin(speed_angle) , agv_p.product, math.sqrt(agv.v_x**2 + agv.v_y**2))
-			expected_arrival_time += unloading_processing + setup_time # update the expected arrival time for the following element of the platoon
+# 		if agv.destination_entity == const.DEST_UNLOADINGSTATION:
+# 			agv.platoon_type = const.PLATOON_UNLOADING # add agv to platoon 
+# 			### END: Handle AGVs who have different destinations (charging stations, unloading unit)
+# 		### BEGIN: Platoon control for AGVs who share destination
+# 	#platoon_charging = [agv for agv in AGVs if agv.platoon_type == const.PLATOON_CHARGING]
+# 	platoon_unloading = [agv for agv in AGVs if agv.platoon_type == const.PLATOON_UNLOADING]
+# 	if platoon_unloading: #If it is not empty (--> at least one AGV is going to unloading)
+# 		target_pos = (34.0, 50.0)
+# 		distance_from_unloading = [np.sqrt((agv.x - target_pos[0])**2 + (agv.y - target_pos[1])**2) for agv in platoon_unloading] 	# Calculate distance of each AGV from the fixed point
+# 		sorted_indices = np.argsort(distance_from_unloading) # Sort the AGVs based on their distances
+# 		# Assign the position attribute in increasing order based on the sorted indices
+# 		for position, index in enumerate(sorted_indices):
+# 			   platoon_unloading[index].platoon_position = position + 1
+# 		platoon_unloading.sort(key=lambda agv: agv.platoon_position) # Sort platoon based on platoon_position
+# 		distance_from_unloading.sort()
+# 		if ncm.get_unloading_availability() == const.IDLE:
+# 			# Unloading unit is free
+# 			static_obstacles = obstacles[~np.all(obstacles == target_pos, axis=1)] # Remove the target from the list of obstacles
+# 			moving_obstacles = [[vehicle.x, vehicle.y] for vehicle in moving_agvs if vehicle.vehicle_id != platoon_unloading[0].vehicle_id] # Retrieve position of other AGVs moving within the shopfloor
+# 			potential_force = potential_field_controller(target_pos, [platoon_unloading[0].x, platoon_unloading[0].y], static_obstacles, moving_obstacles)
+# 			potential_speed = convert_force_to_speed(potential_force, mass, time_interval, platoon_unloading[0].product)
+# 			ncm.command_speed(platoon_unloading[0].vehicle_id, potential_speed[0], potential_speed[1], platoon_unloading[0].product, math.sqrt(platoon_unloading[0].v_x**2 + platoon_unloading[0].v_y**2))
+# 			expected_arrival_time = tick/2 + distance_from_unloading[0]/(math.sqrt(potential_speed[0]**2 + potential_speed[1]**2)) + unloading_processing # compute the expected arrival time of the first element of the platoon, *10 to match from tick to seconds
+# 			if ncm.get_unloading_completion() < 10000000-999999:
+# 				expected_arrival_time = ncm.get_unloading_completion()
+# 		else:
+# 			# Unloading unit is occupied
+# 			expected_arrival_time = ncm.get_unloading_completion()
+# 			speed_tot = distance_from_unloading[0] / expected_arrival_time
+# 			speed_angle = np.arctan2(platoon_unloading[0].y - target_pos[1], platoon_unloading[0].x - target_pos[0]) # compute the angle with respect to the unloading machine
+# 			ncm.command_speed(platoon_unloading[0].vehicle_id, -speed_tot*np.cos(speed_angle), -speed_tot*np.sin(speed_angle) , platoon_unloading[0].product, math.sqrt(platoon_unloading[0].v_x**2 + platoon_unloading[0].v_y**2))
+# # 			ncm.command_speed(platoon_unloading[0].vehicle_id, potential_speed[0], potential_speed[1] , platoon_unloading[0].product, math.sqrt(platoon_unloading[0].v_x**2 + platoon_unloading[0].v_y**2))
+# 		for index, (agv_p, distance) in enumerate(zip(platoon_unloading[1:], distance_from_unloading[:-1])): # loop over each agv starting from the second, and for each distance except the last one
+# 			# Iterate through all the platoon except the first element
+# 			# Compute angle and speed_x and speed_y for each agv
+# 			speed_tot = distance_from_unloading[index] / (expected_arrival_time + unloading_processing) # compute the average speed (assumed constant) needed to arrive at the destination at the precise time
+# 			speed_angle = np.arctan2(agv_p.y - target_pos[1], agv_p.x - target_pos[0]) # compute the angle with respect to the unloading machine
+# 			ncm.command_speed(agv_p.vehicle_id, -speed_tot*np.cos(speed_angle), -speed_tot*np.sin(speed_angle) , agv_p.product, math.sqrt(agv.v_x**2 + agv.v_y**2))
+# # 			ncm.command_speed(platoon_unloading[0].vehicle_id, potential_speed[0], potential_speed[1] , platoon_unloading[0].product, math.sqrt(platoon_unloading[0].v_x**2 + platoon_unloading[0].v_y**2))
+# 			expected_arrival_time += unloading_processing + setup_time # update the expected arrival time for the following element of the platoon
 			### END: Platoon control for AGVs who share destination
 	### BEGIN: Emergency control
 	distances = compute_agvs_distances(moving_agvs)
@@ -249,7 +248,7 @@ average_speeds_noPayload = np.round(average_speeds_noPayload,3)
 average_rate_change = np.round(average_rate_change,3)
 energy_consumption = np.round(energy_consumption,3)
 average_battery = np.round(average_battery,3)
-### Record results on csv file
+#%% Record results on csv file
 csv_file = 'results.csv'
 with open(csv_file, 'a', newline='') as file:
 	writer = csv.writer(file)
@@ -257,4 +256,4 @@ with open(csv_file, 'a', newline='') as file:
 # Energy Consumption 32-->41 - Rate of Speed 42-->51 - Number of recharged vehicles 52 - Average Battery when Recharging 53
 	writer.writerow([makespan, ', '.join(map(str, average_speeds)), ', '.join(map(str, average_speeds_Payload)),  
 				  ', '.join(map(str, average_speeds_noPayload)), ', '.join(map(str, energy_consumption)), 
-				   ', '.join(map(str, average_rate_change)),', ', vehicles_recharged, ', ', average_battery])
+				   ', '.join(map(str, average_rate_change)),', ', vehicles_recharged, ', ', average_battery,  ', ', time_in_congestion])

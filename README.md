@@ -3,7 +3,7 @@
 Integrating platoon-based techniques within smart manufacturing systems
 
 
-Research article:[A Platoon-Based Approach for AGV Scheduling and Trajectory Planning in Fully Automated Production Systems](https://ieeexplore.ieee.org/abstract/document/10716253)
+Research article: [A Platoon-Based Approach for AGV Scheduling and Trajectory Planning in Fully Automated Production Systems](https://ieeexplore.ieee.org/abstract/document/10716253)
 
 Please cite:
   > Bozzi, Alessandro, et al. "A Platoon-Based Approach for AGV Scheduling and Trajectory Planning in Fully Automated Production Systems." IEEE Transactions on Industrial Informatics (2024).

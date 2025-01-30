@@ -3,8 +3,11 @@
 Integrating platoon-based techniques within smart manufacturing systems
 
 
-Overleaf(Latex) project: https://www.overleaf.com/2212164663mhrbpfvqpwtn
+Research article:[A Platoon-Based Approach for AGV Scheduling and Trajectory Planning in Fully Automated Production Systems](https://ieeexplore.ieee.org/abstract/document/10716253)
 
+Please cite:
+  > Bozzi, Alessandro, et al. "A Platoon-Based Approach for AGV Scheduling and Trajectory Planning in Fully Automated Production Systems." IEEE Transactions on Industrial Informatics (2024).
+>
 
 ## User guide
 The main point of this work is the integration between Netlogo and Python to make a smart manufacturing system evolve over time, while retrieving data from Netlogo, sending them to Python in order to perform computations, provide control actions and finally send them back to Python.
@@ -34,3 +37,17 @@ In _potentialField_controller.py_:
 
 In _AGV.py_:
 - **Kr, Ka, Kb gains**: gains for the decision-making process regarding recharging scheduling
+
+## Dependencies  
+Ensure you have the required dependencies installed before running the code:  
+```bash
+pip install scipy
+pip install pynetlogo
+```
+## Known Issues
+- The module ```pyNetLogo``` has been renamed to ```pynetlogo``` (all lowercase).
+- While the import statement has been updated with a quick fix (```import pynetlogo as pyNetLogo```), references to ```pyNetLogo``` may still exist in the code. These should be reviewed and updated if necessary in future revisions.
+
+  
+> [!NOTE]
+>  In case of the error ```No module named "pynetlogo"``` or ```No module named "pyNetLogo"``` verify which module is installed and modify the code accordingly.

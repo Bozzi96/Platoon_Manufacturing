@@ -250,11 +250,11 @@ average_rate_change = np.round(average_rate_change,3)
 energy_consumption = np.round(energy_consumption,3)
 average_battery = np.round(average_battery,3)
 ### Record results on csv file
-csv_file = 'results.csv'
-with open(csv_file, 'a', newline='') as file:
-	writer = csv.writer(file)
-# Makespan 1 - Average Speeds 2-->11 - Average Speeds with Payload 12-->21 -  Average Speeds without Payload 22--> 31 ....
-# Energy Consumption 32-->41 - Rate of Speed 42-->51 - Number of recharged vehicles 52 - Average Battery when Recharging 53
-	writer.writerow([makespan, ', '.join(map(str, average_speeds)), ', '.join(map(str, average_speeds_Payload)),  
-				  ', '.join(map(str, average_speeds_noPayload)), ', '.join(map(str, energy_consumption)), 
-				   ', '.join(map(str, average_rate_change)),', ', vehicles_recharged, ', ', average_battery])
+# csv_file = 'results.csv'
+# with open(csv_file, 'a', newline='') as file:
+# 	writer = csv.writer(file)
+# # Makespan 1 - Average Speeds 2-->11 - Average Speeds with Payload 12-->21 -  Average Speeds without Payload 22--> 31 ....
+# # Energy Consumption 32-->41 - Rate of Speed 42-->51 - Number of recharged vehicles 52 - Average Battery when Recharging 53
+# 	writer.writerow([makespan, ', '.join(map(str, average_speeds)), ', '.join(map(str, average_speeds_Payload)),  
+# 				  ', '.join(map(str, average_speeds_noPayload)), ', '.join(map(str, energy_consumption)), 
+# 				   ', '.join(map(str, average_rate_change)),', ', vehicles_recharged, ', ', average_battery])

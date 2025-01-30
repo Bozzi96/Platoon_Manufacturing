@@ -6,7 +6,8 @@ Created on Wed May 31 14:43:40 2023
 """
 
 ### SETUP of Netlogo
-import pyNetLogo
+#import pyNetLogo # Una volta funzionava, ora forse ha cambiato nome (vedi riga sotto)
+import pynetlogo as pyNetLogo
 import constant as const
 import numpy as np
 import math
